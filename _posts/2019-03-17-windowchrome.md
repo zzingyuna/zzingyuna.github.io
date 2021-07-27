@@ -21,7 +21,7 @@ namespace ConsoleApp1
 		{
 			using (IWebDriver driver = new ChromeDriver())
 			{
-				driver.Url = "https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fphotoslibrary%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fphotoslibrary.readonly&access_type=offline&include_granted_scopes=true&state=state_parameter_passthrough_value&redirect_uri=http%3A%2F%2Flocalhost%2Fstudy%2Ftest.html&response_type=code&client_id=307558157269-tfuep5e4ece7hj0lun4gog6lki2mpht2.apps.googleusercontent.com";
+				driver.Url = "https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fphotoslibrary%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fphotoslibrary.readonly&access_type=offline&include_granted_scopes=true&state=state_parameter_passthrough_value&redirect_uri=http%3A%2F%2Flocalhost%2Fstudy%2Ftest.html&response_type=code&client_id={client_id}";
 
 				IWebElement txtmail = driver.FindElement(By.Id("identifierId"));//driver.FindElement(By.Name("q"));
 				txtmail.SendKeys("kimyuna9944@gmail.com");
