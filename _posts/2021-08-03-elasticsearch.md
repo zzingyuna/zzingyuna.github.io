@@ -15,6 +15,11 @@ logs: 이벤트와 오류에 대한 정보가 담긴 파일이 저장될 위치
 plugins: 설치된 플러그인이 저장된 위치
 work: elasticsearch가 사용하는 임시 파일이 저장될 위치
 
+
+JVM(Java Virtual Machine) 힙 메모리 제약
+ES_HEAP_SIZE 값을 1024보다 크게 설정, 전체 시스템 메모리의 50%가 넘지 않아야 한다.
+
+
 클러스터 상태 점검
 $ curl -XGET http://127.0.0.1:9200/_cluster/health?pretty
 
@@ -94,3 +99,109 @@ analyze_wildcard=true
 title:book^4  
 
 
+numeric_detection:true
+문자열을 숫자로 인지하여 검색 가능
+
+
+dynamic_date_formats
+새 문자열 필드를 검사하여 내용이 에 지정된 날짜 패턴과 일치하는지 확인합니다
+
+
+dynamic:false
+자동 필드 추가 기능 off
+
+
+
+타입 속성
+문자열, 숫자, 날짜, 부울, 바이너리 설정 가능
+index_name: 색인에 저장될 필드 이름, 정의하지 않으면 해당 필드를 정의한 객체 이름으로 설정된다
+
+index: analyzed와 no 값으로 설정 가능, 문자열 필드일 경우 not_analyzed라고 설정 가능, analyzed 필드는 색인되므로 검색 가능한 필드, no로 설정하면 검색 불가능한 필드, not_analyed인 경우 필드는 색인되지만 분석되지는 않아 검색어가 완벽하게 일치해야 결과에 포함된다. index 프로퍼티를 no로 설정하면 해당 필드의 include_in_all 프로퍼티를 비활성화 한다
+
+store: yes로 설정하면 필드의 원본 값을 색인에 기록, no는 기본값으로 원본 내용을 결과에 담아 반환하지 않는다. 색인은 되어 있으므로 이 필드를 대상으로 자료를 검색가능하다
+
+boost: 기본값은 1, 속성값이 높을수록 해당 필드의 값이 중요하다
+
+null_value: 필드가 색인된 다큐먼트의 일부로 포함되지않은 경우 색인에 기록될 값을 명세, 필드 생략이 기본 방식
+
+copy_to: 모든 필드값을 복사할 필드를 명세
+
+include_in_all: 대항 필드가 _all 필드에 반드시 포함되어야 하는지 명세
+
+
+문자열 속성
+term_vector: no(기본값), yes, with_offsets, with_positions, with_positions_offsets 라는 값 설정 가능, 루씬 키워드 백터 계산 방식 정의
+
+omit_norms: 분석될 문자열 필드 false(기본값), 색인되지만 분석되지 않을 문자열 true
+
+analyzer: 색인과 검색을 위해 사용될 분석기 이름 정의, 전역으로 정의된 분석기 이름 사용
+
+index_analyzer: 색인을 위해 사용할 분석기 이름
+
+search_analyzer: 특정 필드로 전송한 질의문자열의 일부를 처리하기 위해 사용할 분석기 이름 정의
+
+norms.enabled: 특정 필드를 위해 norms를 메모리에 올릴지 여부, 기본 true=메모리에 올린다
+
+norms.loading: eager는 해당 필드에 대한 norms가 항상 메모리에 올려져 있음, lazy는 필요할 때만 메모리에 올림
+
+position_offset_gap: 기본값 0, 색인에서 이름이 동일한 필드의 인스턴스 사이에 떨어진 차이 명세
+
+index_options: 키워드를 담은 구조체인 출현 목록을 위한 색인 옵션 정의, docs: 다큐먼트번호만 색인, freqs: 다큐먼트 번호와 키워드빈도 색인, positions: 다큐먼트 번호와 키워드빈도와 위치 색인(기본값)
+
+ignore_above: 필드의 최대 크기를 글자 수로 정의, 크기가 더 큰 값이 들어올 경우 무시된다.
+
+
+
+숫자 속성
+byte, short, integer, long, float, double
+precision_step: 필드값에 대해 생성될 키워드 수 명세, 값이 작을 수록 생성되는 키워드 수가 늘어난다, 값 당 키워드 수가 많을수록 색인 비용이 크지만 범위 질의는 빨라진다. 기본값은 4
+
+ignore_malformed: 기본값 false, 형식이 엉망이인 값을 제외하려면 true로 설정
+
+
+날짜 속성
+기본적으로 UTC로 저장
+format: 날짜 형식 명세, 기본값은 dateOptionalTime
+
+precision_step: 필드값에 대해 생성될 키워드 수 명세, 값이 작을 수록 생성되는 키워드 수가 늘어난다, 값 당 키워드 수가 많을수록 색인 비용이 크지만 범위 질의는 빨라진다. 기본값은 4
+
+
+복수 필드 설정
+```
+"name" : {
+    "type": "string",
+    "fields": {
+        "subname": { "type": "string", "index": "not_analyed" }
+    }
+}
+
+첫번째 필드는 name으로 두번째 필드는 name.subname으로 참조 가능.
+```
+
+
+IP 주소 타입 필드 설정
+```
+"address": { "type": "ip", "store": "yes"}
+```
+
+token_count 타입
+필드에 제공된 텍스트를 저장하고 색인하는 대신 필드에 얼마나 많은 단어가 존재하는지에 대한 색인 정보를 저장하게 만든다.
+
+
+분석기
+standard: 유럽 언어에 맞춘 표준 분석기
+simple: 문자를 기준으로 제공된 값을 분리, 소문자로 변환
+whitespace: 여백 문자를 기준으로 제공된 값을 분리
+stop: 제공된 불용어 집합에 기반해 자료를 필터링
+keyword: 제공된 값을 그대로 전달하는 분석기, not_analyzed로 특정 필드를 명세하는 경우와 동일한 효과
+pattern: 정규 표현식을 사용해 유연하게 텍스트를 분리
+lanuage: 특정 언어를 위해 동작하게 설계된 분석기
+snowball: standard와 유사하지만 어간 추출 알고리즘을 추가로 제공
+
+
+"similarity": "BM25"
+점수 지수를 계산하기위해 BM25를 사용하여 필드 정의
+
+
+유사성 모델
+Okapi BM25: 해당 질의에 대한 다큐먼트를 찾을 확률을 추정하는 확률론적 모델
