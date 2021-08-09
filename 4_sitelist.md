@@ -41,6 +41,32 @@ tagline: Sitelist
 
 [타입스크립트](https://ahnheejong.gitbook.io/ts-for-jsdev/01-introducing-typescript/why-typescript) 
 
+[developer.mozilla.org](https://developer.mozilla.org/ko/)  
+
+[패스트캠퍼스](https://fastcampus.co.kr/)  
+
+[파이썬 기초](https://kongdols-room.tistory.com/18)  
+
+[타입스크립트](https://heropy.blog/2020/01/27/typescript/)  
+
+[엘라스틱서치](https://esbook.kimjmin.net/)  
+
+[엘라스틱서치 REST API](https://www.jopenbusiness.com/mediawiki/ElasticSearch_-_REST_API)  
+
+[자격증 기출문제](https://www.comcbt.com/)  
+
+[사이트 검증](https://validator.w3.org/)  
+
+[데이터온에어](https://dataonair.or.kr/db-tech-reference/d-guide/sql/)  
+
+[게임엔진](https://defold.com/)  
+
+[프로그래머스](https://programmers.co.kr/)  
+
+[오픈튜토리얼스](https://opentutorials.org/)  
+
+[Coursera](https://www.coursera.org/)  
+
 ### 안드로이드 테스트 관련   
 [https://m.blog.naver.com/PostView.nhn?blogId=90600074&logNo=120199537891&proxyReferer=https%3A%2F%2Fwww.google.com%2F](https://m.blog.naver.com/PostView.nhn?blogId=90600074&logNo=120199537891&proxyReferer=https%3A%2F%2Fwww.google.com%2F)  
   
