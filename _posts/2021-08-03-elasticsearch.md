@@ -397,4 +397,339 @@ year 필드에서 1800을 뺀 값을 correctYear라는 필드로 반환
 검색 타입  
 내부적으로 질의를 처리하는 방식 선택  
 search_type 요청 매개변수를 추가하고 아래 값 중 하나를 선택  
-query_then_fetch: 
+query_then_fetch: 기본값, 다큐먼트를 정렬하고 순위를 매기고자 할때  
+query_and_fetch: 모든 샤드를 대상으로 병렬로 질의 수행  
+dfs_query_and_fetch: query_and_fetc 와 비슷, 분산된 키워드 빈도를 계산하는 작업 추가 단계 존재  
+dfs_query_then_fetch: query_then_fetch와 비슷, 분산된 키워드 빈도를 계산하는 작업 추가 단계 존재  
+count: 질의와 일치하는 다큐먼트 수만 반환  
+scan: 질의가 엄청난 결과를 반환하리라 기대할 경우에 사용  
+
+
+검색 수행 우선순위  
+질의를 수행할 샤드 제어, preference 요청 매개변수에 설정  
+_primary  주 샤드에서만 실행, 색인에서 최신 정보를 사용하길 원하지만 자료가 바로 복제되지 않을 경우 유용  
+_primary_first  주 샤드에서 실행  
+_local  요청을 전송받은 노드의 사용 가능한 샤드에서 실행  
+_only_node:node_id  노드 식별자로 지정한 노드에서 실행  
+_preter_node:node_id  노드 식별자로 지정한 노드에서 실행, 해당 노드가 사용 불가할 경우 다른 노드에서 실행  
+_shards:1,2  샤드 식별자로 지정한 샤드에서 검색 연산 수행  
+사용자 정의값  
+
+
+검색 샤드 API  
+```
+GET /*/_search_shards
+{
+    "query": {
+        "match_all": {}
+    }
+}
+```
+
+
+term 질의  
+대상 필드에 키워드가 존재하는 다큐먼트와 일치하는지만 판단, 정확하지만 분석되지 않은 키워드  
+색인된 다큐먼트에 포함된 키워드와 정확히 일치, boost 속성 포함 가능  
+
+
+terms 질의  
+내용에 특정 키워드가 여러 개 들어 있는 다큐먼트와 일치하는지 판단  
+분석되지 않은 여러 키워드와 일치하는 결과 제공  
+minimum_match 프로퍼티로 일치하는 개수 설정 가능  
+
+
+match_all 질의  
+색인에 존재하는 모든 다큐먼트와 일치하는 결과 제공, boost 속성 포함 가능  
+
+
+common 키워드 질의  
+불용어를 사용하지 않을 때 흔히 사용하는 단어에 대한 질의 관련성와 정확성 개선을 위해 사용  
+질의를 두 그룹으로 나눠 첫번째 그룹은 중요한 키워드로 구성, 수행 후 두번 째 그룹에 대해 질의 수행  
+사용 매개변수  
+query: 실재 질의내용 정의  
+cutoff_frequency: 높은 빈도 그룹과 낮은 빈도 그룹의 기준인 퍼센트 값 지정  
+low_freq_operator: or나 and로 설정 가능, 낮은 빈도 키워드 그룹에서 질의 구성하기 위해 부울 연산자 명세, 모든 키워드가 존재하기를 원한다면 and로 설정  
+high_freq_operator: or나 and로 설정 가능, 높은 빈도 키워드 그룹에서 질의 구성하기 위해 부울 연산자 명세, 모든 키워드가 존재하기를 원한다면 and로 설정  
+minimum_should_match: 일치하기 위해 다큐먼트에 존재해야 할 최소 키워드 수 명세  
+boost: 다큐먼트 점수에 반영할 중요도 정의  
+analyzer: 질의 텍스트를 분석하기 위해 사용할 분석기 이름과 기본 분석기 정의  
+disable_coord: 기본값 false, 다큐먼트가 포함하는 모든 질의 키워드의 비율에 기반한 점수 지수 계산 활성화 여부  
+
+
+
+match 질의  
+질의 매개변수로 넘긴 값을 받아 분석한 다음 적절한 질의 생성  
+루씬 질의 구문을 지원하지않는다  
+
+
+부울 match 질의  
+제공된 텍스트를 분석하고 bool 질의를 생성  
+operator: or, and로 설정, 기본값 or  
+analyzer: 질의 텍스트를 분석하기 위해 사용할 분석기명 지정  
+fuzziness: 퍼지fuzzy 질의 생성  
+prefix_length: 퍼지 질의 동작 방식 제어  
+max_expansions: 퍼지 질의 동작 방식 제어
+zero_terms_query: 분석기가 모든 키워드를 제거할 때 질의 동작 방식 명세, none 기본값  
+cutoff_frequency: 질의를 높은 빈도 키워드와 낮은 빈도 키워드라는 두 그룹으로 나눈다  
+```
+{
+    "query": {
+        "match": {
+            "title" : {
+                "query": "crime and punishment",
+                "operator": "and"
+            }
+        }
+    }
+}
+```
+
+
+
+match_phrase 질의  
+분석된 텍스트에서 구phrase 질의를 생성  
+slop: 구를 판별하기 위해 키워드 사이에 알려져 있지 않은 단어가 얼마나 많이 들어갈 수 있는지를 정의하는 정수값  
+analyzer: 질의 텍스트를 분석하기 위해 사용할 분석기 이름과 기본 분석기를 정의  
+```
+{
+    "query": {
+        "match_phrase": {
+            "title" : {
+                "query": "crime and punishment",
+                "slop": 1
+            }
+        }
+    }
+}
+```
+
+
+multi_match 질의  
+fields 매개변수에 담긴 여러 필드를 대상으로 수행  
+```
+{
+    "query": {
+        "multi_match": {
+            "query": "crime and punishment",
+            "fields": ["title", "content"]
+        }
+    }
+}
+```
+use_dis_max: 부울값 정의, 기본값 true, dismax 질의나 bool 질의를 설정  
+tie_breaker: use_dis_max 매개변수를 true로 설정한 경우에만 사용, 최저 점수 질의 항목과 최대 점수 질의 항목 사이의 균형을 명세  
+
+
+query_string 질의  
+아파치 루씬 질의 구문 지원  
+```
+{
+    "query": {
+        "query_string": {
+            "query": "title:crime^10 +title:punishment -otitle:cat +author:(+Fyodor +dostoevsky)",
+            "default_field": "title"
+        }
+    }
+}
+```
+query: 질의 텍스트 명세  
+default_field: 질의 실행을 위한 기본 필드 명세  
+default_operator: 기본값 or, 기본 논리 연산자 명세  
+analyzer: 질의를 분석하기 위해 사용할 분석기의 이름 명세  
+allow_leading_wildcard: 와일드카드 문자를 키워드의 첫 글자로 허용할지 말지 명세, 기본값 true  
+lowercase_expand_terms: 질의 재작성 결과로 만들어져야 하는 키워드가 소문자인지 여부 명세, 기본값 true  
+enable_position_increments: 결과 질의에서 위치 증가 기능을 켤지 여부 명세, 기본값 true  
+fuzzy_max_expansions: fuzzy 질의를 확장하는 최대 키워드 수 명세, 기본값 50  
+fuzzy_prefix_length: 생성된 fuzzy 질의 접두어 길이를 명세, 기본값 0  
+fuzzy_min_sim: fuzzy 질의에 대한 최소 유사성 명세, 기본값 0.5  
+phrase_slop: 구에 대한 slop값 명세, 기본값 0  
+boost: 중요도 값, 기본값 1.0  
+analyze_wildcard: wildcard 질의가 생성한 키워드를 분석할지 여부, 기본값 false  
+auto_generate_phrase_queries: 질의에서 자동으로 구 질의를 생성할지 여부, 기본값 false  
+minimum_should_match: 다큐먼트와 일치한다고 가정하기 위해 충족해야 하는 절의 최소 부울 조건, 퍼센트가 정수값 사용  
+lenient: 형식이 잘못된 오류 무시여부  
+
+DisMax는 Disjunction Max 의 줄임말  
+분리 Disjunction는 여러 필드에 대해 검색이 실행되며 필드마다 중요도 가중치를 다르게 줄 수 있다  
+최대는 해당 키워드에 대한 최고 점수만 마지막 다큐먼트 점수에 포함되며 일치하는 키워드를 담은 모든 필드의 점수를 합치지 않는다  
+
+
+
+여러 필드에 대한 query_string 질의 수행  
+bool 질의를 사용해 질의를 생성하는 기본방법, dismax 질의를 사용하는 방법 존재  
+dismax 질의를 사용하려면 질의 내용에 use_dis_max 프로퍼티를 true로 설정해야 함  
+```
+{
+    "query": {
+        "query_string": {
+            "query": "crime punishment",
+            "fields": ["title", "content"],
+            "use_dis_max": true
+        }
+    }
+}
+```
+
+
+simple_query_string 질의  
+오류가 발생해도 예외를 던지지 않는다  
+```
+{
+    "query": {
+        "simple_query_string": {
+            "query": "title:crime^10 +title:punishment -otitle:cat +author:(+Fyodor +dostoevsky)",
+            "default_operator": "and"
+        }
+    }
+}
+```
+
+
+ids 질의  
+식별자를 기준으로 반환된 다큐먼트를 필터링  
+"type": "book" 과 같이 특정 타입에 대해서만 검색 가능  
+```
+{
+    "query": {
+        "ids": {
+            "type": "book",
+            "values": ["10", "15", "20"]
+        }
+    }
+}
+```
+
+
+prefix 질의  
+해당 접두어로 시작하는 값이 특정 필드에 포함한 다큐먼트와 일치하는지 판단  
+boost 속성 포함 가능  
+```
+{
+    "query": {
+        "prefix": {
+            "title": "cri"
+        }
+    }
+}
+```
+
+
+
+fuzzy_like_this 질의  
+more_like_this 질의와 유사, 퍼지 문자열을 사용, 키워드를 생성한 다음 최고로 차별화된 키워드를 고른다  
+```
+{
+    "query": {
+        "fuzzy_like_this": {
+            "fields": ["title", "content"],
+            "like_text": "crime punishment"
+        }
+    }
+}
+```
+fields: 질의를 수행할 대상 필드  
+like_text: 타큐먼트와 비교할 텍스트  
+ignore_tf: 유사성 계산에서 키워드 빈도를 무시할지 여부, 기본값 false  
+max_query_terms: 생성된 질의에 포함될 최대 질의 키워드 수 명세, 기본값 25  
+min_similarity: 차별화된 키워드의 최소 유사성 명세, 기본값 0.5  
+prefix_length: 차별화된 키워드의 공통 접두어 길이 명세, 기본값 0  
+boost: 질의 중요도, 기본값 1.0  
+analyzer: 제공된 질의를 분석하기 위해 사용할 분석기 이름  
+
+
+fuzzy_like_this_field 질의  
+fuzzy_like_this와 비슷, 단일 필드를 대상으로 동작
+```
+{
+    "query": {
+        "fuzzy_like_this_field": {
+            "title": {
+                "like_text": "crime punishment"
+            }
+        }
+    }
+}
+```
+
+
+fuzzy 질의  
+에디트 거리edit distance 알고리즘 기반, 검색된 다큐먼트를 대상으로 질의에 넘긴 키워드를 기준으로 삼아 에디트 거리를 계산  
+철자 오류에도 불구하고 관심이 있는 다큐먼트를 찾는데 성공  
+value: 실제 질의  
+boost: 중요도 값, 기본값 1.0  
+min_similarity: 일치한다고 판단하기위한 키워드의 최소 유사성  
+prefix_length: 공통 접두어 길이, 기본값 0  
+max_expansions: 질의에서 확장될 최대 키워드 수 명세, 기본값 unbounded  
+
+
+
+wildcard 질의  
+*나 ? 같은 와일드 카드 사용 허용  
+boost 속성 포함  
+
+
+
+more_like_this 질의  
+제공된 텍스트와 유사한 다큐먼트 조회  
+fields: 질의 대상 필드  
+like_text: 다큐먼트와 비교할 텍스트  
+percent_terms_to_match: 질의에 속한 키워드의 퍼센트, 기본값 0.3  
+min_term_freq: 이 값보다 작을 경우 키워드를 무시할 기준이 되는 빈도, 기본값 2  
+max_query_terms: 최대 질의 키워드 수 명세, 기본값 25  
+stop_words: 무시할 단어의 배열  
+min_doc_freq: 최소한 다큐먼트에 존재해야할 키워드 수, 기본값 5  
+max_doc_freq: 최대한 다큐먼트에 존재 가능한 키워드 수, 기본값 unbounded  
+min_word_len: 무시하지 않기 위한 단일 단어의 최소 길이, 기본값 0  
+max_word_len: 무시하지 않기 위한 단일 단어의 최대 길이, 기본값 unbounted  
+boost_terms: 개별 항목의 중요도 값, 기본값 1  
+boost: 중요도 값, 기본값 1.0  
+analyzer: 질의 분석기 이름  
+
+
+more_like_this_field 질의  
+more_like_this 질의와 유사, 단일 필드에 대해서만 동작  
+```
+{
+    "query": {
+        "more_like_this_field" : {
+            "title": {
+                "like_text": "crime and punishement",
+                "min_term_freq": 1,
+                "min_doc_"freq": 1
+            }
+        }
+    }
+}
+```
+
+
+range 질의  
+특정 범위에 속한 필드값을 포함한 다큐먼트를 찾는다  
+단일 필드에서만 사용 가능  
+gte: 지정한 값보다 크거나 같은 값인지 판단  
+gt: 지정한 값보다 큰 값인지 판단  
+lte: 지정한 값보다 작거나 같은 값인지 판단  
+lt: 지정한 값보다 작은 값인지 판단  
+```
+{
+    "query": {
+        "range" : {
+            "year": {
+                "gte": 1700,
+                "lte": 1900
+            }
+        }
+    }
+}
+```
+
+
+dismax 질의  
+모든 하위 질의가 반환한 다큐먼트를 결합해결과를 이를 반환할 경우 유용  
+점수가 낮은 하위 질의가 다큐먼트의 최종 점수에 영향을 미치는 방법을 통제할 수 있다  
+
+
+regexp 질의  
+정규표현식을 사용  
+
+
