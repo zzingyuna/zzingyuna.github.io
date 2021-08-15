@@ -733,3 +733,324 @@ regexp 질의
 정규표현식을 사용  
 
 
+---------------------------------------------------------
+복합 질의  
+
+
+bool 질의  
+should: 조건에 따라 일치할 수도 일치하지 않을 수도 있다  
+must: 반드시 일치해야 한다  
+must_not: 반드시 일치하지 않아야 한다  
+boost: 중요도 값, 기본값 1.0  
+minimum_should_match: 충족해야 하는 should 절의 최소 부울 조건 제어, 퍼센트나 정수값 사용  
+disable_coord: 기본값 false, 점수 지수 계산을 활성화/비활성화, 정확도는 떨어지나 조금 빠른 질의를 위해서는 true로 설정  
+
+
+boosting 질의  
+질의 중 하나가 반환하는 다큐먼트 점수를 낮춘다  
+positive 절은 다큐먼트 점수가 변경되지 않고 남을 질의  
+negative 절은 다큐먼트 점수를 낮춰야 할 질의  
+negative_boost 절은 negative 절의 질의 점수를 낮추기 위한 중요도 값  
+
+
+constant_score 질의  
+다른 질의를 감싸며 감싼 질의가 반환하는 다큐먼트마다 상수 점수를 반환  
+
+
+indices 질의  
+여러 색인에 다른 질의를 수행할 때 사용  
+색인 배열과 질의 두가지 값 필요  
+
+
+결과 필터링  
+post_filter대신 filtered 질의를 사용하는 것이 훨씬 더 빠르다  
+
+
+필터 사용  
+```
+{
+    "query": {
+        "match" : {
+            "title": "test"
+        }
+    },
+    "post_filter" :{
+        "term": { "year": 1961 }
+    }
+}
+```
+
+
+필터 타입  
+range 필터  
+```
+{
+    "post_filter" :{
+        "range": {
+            "year": {
+                "gte": 1930,
+                "lte": 1990
+            }
+        }
+    }
+}
+```
+
+exists 필터  
+지정 필드의 값이 없는 다큐먼트 제외  
+```
+{
+    "post_filter" :{
+        "exists": {
+            "field": "year"
+        }
+    }
+}
+```
+
+missing 필터  
+지정 필드의 값이 있는 다큐먼트 제외  
+```
+{
+    "post_filter" :{
+        "missing": {
+            "field": "year",
+            "null_value": 0,
+            "existence": true
+        }
+    }
+}
+```
+
+script 필터  
+계산된 값으로 필터링 할 경우  
+```
+{
+    "post_filter" :{
+        "script": {
+            "script": "now - doc['year'].value > 100",
+            "params": {
+                "now": 2012
+            }
+        }
+    }
+}
+```
+
+type 필터  
+```
+{
+    "post_filter" :{
+        "type": {
+            "value": "book",
+        }
+    }
+}
+```
+
+limit 필터  
+단일 샤드에서 반환된 다큐먼트 수를 제한  
+```
+{
+    "post_filter" :{
+        "limit": {
+            "value": 1,
+        }
+    }
+}
+```
+
+ids 필터  
+```
+{
+    "post_filter" :{
+        "ids": {
+            "type": ["book"],
+            "values": [1]
+        }
+    }
+}
+```
+
+multi_match 필터  
+```
+{
+    "post_filter" :{
+        "query": {
+            "multi_match": {
+                "query": "novel erich",
+                "fields": ["tags", "authoer"]
+            }
+        }
+    }
+}
+```
+
+
+필터 캐시  
+결과를 캐시하는 필터: exists, missing, range, term, terms  
+
+
+강조  
+필드의 원본 내용이 존재하여야 한다  
+FastVectorHighlighter, PostingsHighlighter 있다  
+term_vector프로퍼티가 with_positions_offsets로 설정된 필드라면 FastVectorHighlighter 사용할 것이다  
+```
+{
+    "query": {
+        "term": { "title": "crime" }
+    },
+    "highlight": {
+        "fields": { "title": {} }
+    }
+}
+```
+
+
+강조 태그 변경  
+```
+{
+    "query": {
+        "term": { "title": "crime" }
+    },
+    "highlight": {
+        "fields": { "title": {} },
+        "pre_tags": ["<b>"],
+        "post_tags": ["<b>"]
+    }
+}
+```
+
+
+강조되는 영역 제어  
+number_of_fragments: 기본값 5, 반환하는 영역 수 정의, 0으로 설정하면 전체 필드  
+fragment_size: 강조된 영역의 최대 길이를 글자 단위로 명세, 기본값 100  
+
+
+전역 강조  
+```
+{
+    "query": {
+        "term": { "title": "crime" }
+    },
+    "highlight": {
+        "fields": { "title": {} },
+        "pre_tags": ["<b>"],
+        "post_tags": ["<b>"]
+    }
+}
+```
+
+지역 강조  
+```
+{
+    "query": {
+        "term": { "title": "crime" }
+    },
+    "highlight": {
+        "fields": { 
+            "title": {
+                "pre_tags": ["<b>"],
+                "post_tags": ["<b>"]
+            }
+         }
+    }
+}
+```
+
+
+필드 일치 요구  
+질의와 일치하는 필드만 보여주기를 원하는 경우  
+require_field_match: true로 설정  
+
+
+PostingsHighlighter  
+필드 정의에서 index_options 프로퍼티를 offsets 로 설정  
+매핑에 필드 두개 contents, contents.ps 정의
+```
+curl -XPOST 'localhost:9200/test/doc/_mapping' -d '
+{
+    "doc": {
+        "properties": {
+            "contents": {
+                "type": "string",
+                "fields": {
+                    "ps": { "type": "string", "index_options": "offsets" }
+                }
+            }
+        }
+    }
+}'
+```
+
+
+질의 검증  
+```
+curl -XGET 'localhost:9200/test/_validate/query?pretty' -d '{쿼리내용}'
+
+curl -XGET 'localhost:9200/test/_validate/query?pretty&explain' --data-binary '{쿼리내용}'
+```
+
+
+기본 정렬  
+분석되지 않는 필드를 선택해서 정렬하는 것이 바람직  
+```
+{
+    "sort": {
+        "_score": "desc"
+    }
+}
+```
+
+
+누락된 필드를 위한 정렬  
+"missing": "_last" 설정으로 해당 필드가 없는 다큐먼트를 결과 목록의 가장 아래로 보낸다  
+missing 매개변수를 숫자로 설정하면 정의된 필드가 없는 다큐먼트는 필드값이 숫자인 다큐먼트로 취급된다  
+```
+{
+    "sort": {
+        "section": {
+            "order": "asc",
+            "missing": "_last"
+        }
+    }
+}
+```
+
+
+동적 기준으로 정렬  
+tags 필드에 색인된 첫 값으로 정렬  
+```
+{
+    "sort": {
+        "_script": {
+            "script": "doc['tags'].values.length > 0 ? doc['tags'].values[0] : '\u19999'",
+            "type": "string",
+            "order": "asc"
+        }
+    }
+}
+```
+
+
+질의 재작성  
+prefix,  wildcard 질의와 같은 복수 키워드 질의는 성능적인 이유로 인해 재작성 기능 사용  
+질의 재작성 방식을 제어하기 위해 복수 키워드 질의에서 rewriter 매개변수 사용 가능  
+```
+{
+    "query": {
+        "prefix": {
+            "title": "s",
+            "rewrite": "constant_score_boolean"
+        }
+    }
+}
+```
+scoring_boolean: 생성된 각각의 키워드를 부울 should 절로 변환  
+constant_score_boolean: scoring_boolean와 비슷 점수 계산이 없어 CPU 덜 소비  
+constant_score_filter: 키워드에 대한 모든 다큐먼트를 표시하게 동작하는 전용 필터 생성  
+top_terms_N: 생성된 각각의 키워드를 부울 should 절로 변환, 부울 절의 최대 제약을 넘기지 않게 상위 점수 N개만 유지  
+top_terms_boost_N: top_terms_N과 유사, 점수는 질의가 아닌 중요도로 계산  
+
+
+
