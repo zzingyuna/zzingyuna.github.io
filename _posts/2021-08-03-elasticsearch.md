@@ -1447,3 +1447,371 @@ date_histogram 집계
 geo_distance 집계  
 geohash_grid 집계: [https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html)  
 
+
+
+집계 중첩 예  
+```
+{
+    "aggs": {
+        "variations": {
+            "nested": {
+                "path": "variation"
+            },
+            "aggs": {
+                "sizes": {
+                    "terms": {
+                        "field": "variation.size"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+
+중첩된 집계에서 얻은 값을 사용한 집계  
+```
+{
+    "aggs": {
+        "availability": {
+            "terms": {
+                "field": "copies",
+                "order": { "numbers.avg": "desc" }
+            },
+            "aggs": {
+                "numbers": { "stats": {} }
+            }
+        }
+    }
+}
+```
+
+
+전역과 부분 집합  
+```
+{
+    "query": {
+        "filtered": {
+            "query": {
+                "match_all": {}
+            },
+            "filter": {
+                "term": { "available": "true" }
+            }
+        }
+    }
+    "aggs": {
+        "with_global": {
+            "global": {},
+            "aggs": {
+                "copies": {
+                    "value_count": {
+                        "field": "copies"
+                    }
+                }
+            }
+        },
+        "without_global": {
+            "value_count": {
+                "field": "copies"
+            }
+        }
+    }
+}
+```
+
+
+포함과 배제 예  
+```
+{
+    "aggs": {
+        "availability": {
+            "terms": {
+                "field": "characters",
+                "exclude": "al.*",
+                "include": "a.*"
+            }
+        }
+    }
+}
+```
+
+
+패싯 타입 정보  
+_type: 사용된 패싯 타입 정의, 패싯 타입마다 독자적으로 제공  
+missing: 패싯을 계산하기에 충분한 자료가 없는 다큐먼트 수를 정의  
+total: 패싯 계산 과정에서 존재하는 토큰 수 정의  
+other: 반환된 수에 포함되지 않는 패싯값의 수를 정의  
+
+
+패싯 결과에서 질의와 일치하는 다큐먼트 수 얻기  
+```
+{
+    "query": { "match_all": {} },
+    "facets": {
+        "my_query_facet": {
+            "query": {
+                "term": { "tags": "personal" }
+            }
+        }
+    }
+}
+```
+
+
+패싯 계산에 필터 사용(질의를 감싼 필터 패싯이나 질의 패싯보다 빠름)  
+```
+{
+    "query": { "match_all": {} },
+    "facets": {
+        "my_filter_facet": {
+            "filter": {
+                "term": { "tags": "personal" }
+            }
+        }
+    }
+}
+```
+
+
+키워드 패싯(빈도가 높은 키워드 반환)  
+```
+{
+    "query': { "match_all": {}},
+    "facets": {
+        "tags_facet_result": {
+            "terms": {
+                "field": "tags"
+            }
+        }
+    }
+}
+```
+
+
+term 패싯 매개변수  
+- size: 빈도가 높은 최상위 키워드가 몇 개인지 명세  
+- shard_size: 샤드당 결과 수 명세, size 매개변수 보다 낮은 값으로 설정 불가  
+- order: 패싯 순서 명세 (count:기본값 빈도 높은 수부터, term:알파벳 오름차순, reverse_count: 빈도 낮은 수 부터, reverse_term:알파벳 내림차순)  
+- all_terms: true로 설정하면 결과에 모든 키워드 반환  
+- exclude: 패싯 계산에서 배제되어야 할 키워드 명세  
+- regex: 패싯 계산 과정에 포함될 키워드를 제어할 정규표현식 명세  
+- script: 패싯 계산에서 키워드 처리 목적으로 사용될 스크립트 명세  
+- fields: 패싯 계산을 위해 복수 필드를 지정하는 배열 명세  
+- script_field: 계산 목적으로 실제 키워드를 제공할 스크립트 정의  
+
+
+범위 기반 패싯  
+```
+{
+    "query': { "match_all": {}},
+    "facets": {
+        "ranges_facet_result": {
+            "range": {
+                "field": "total",
+                "ranges": [
+                    { "to": 90 },
+                    { "from": 90, "to": 180 },
+                    { "from": 180 },
+                ]
+            }
+        }
+    }
+}
+```
+from: 범위의 시작  
+to: 범위의 끝  
+min: 해당 범위에 속한 필드의 최소값  
+max: 해당 범위에 속한 필드의 최대값  
+count: 해당 범위에 속한 필드값이 존재하는 다큐먼트 수  
+total_count: 해당 범위에 속한 정의된 필드값의 총 수  
+total: 해당 범위에 속한 정의된 모든 필드값의 합  
+mean: 해당 범위에 속한 ranges 패싯 과정에 사용된 모든 필드값의 평균값  
+
+
+집계된 자료 계산 과정에서 다른 필드 선택하기  
+범위를 계산하는 필드와는 다른 필드를 대상으로 집계를 할 경우 key_field, key_value 두개의 프로퍼티 사용  
+
+
+histogram 패싯  
+필드값의 간격에 따라 히스토그램을 만든다  
+```
+{
+    "query': { "match_all": {}},
+    "facets": {
+        "total_histogram": {
+            "histogram": {
+                "field": "total",
+                "interval": 1000
+            }
+        }
+    }
+}
+```
+
+
+date_histogram 패싯  
+```
+{
+    "query': { "match_all": {}},
+    "facets": {
+        "date_histogram_test": {
+            "date_histogram": {
+                "field": "date",
+                "interval": day
+            }
+        }
+    }
+}
+```
+
+
+statistical 패싯  
+숫자 필드 타입에 대한 통계 자료 계산  
+```
+{
+    "query': { "match_all": {}},
+    "facets": {
+        "statistical_test": {
+            "statistical": {
+                "field": "total"
+            }
+        }
+    }
+}
+```
+반환되는 통계 목록  
+- _type: 패싯 타입  
+- count: 정의된 필드에 값이 있는 다큐먼트 수  
+- total: 정의된 필드를 모두 합한 값  
+- min: 최소 필드값  
+- max: 최대 필드값  
+- mean: 명세된 필드의 평균값  
+- sum_of_squares: 명세된 필드의 값을 제곱한 결과의 합  
+- variance: 명세된 필드의 분산  
+- std_deviation: 명세된 필드의 표준편차  
+
+
+terms_stat 패싯  
+statistical과 term 패싯을 결합한 형태  
+```
+{
+    "query': { "match_all": {}},
+    "facets": {
+        "total_tags_terms_stats": {
+            "terms_stat": {
+                "key_field": "tags",
+                "value_field": "total"
+            }
+        }
+    }
+}
+```
+key_field: 키워드를 제공하는 필드 이름을 담음  
+value_field 숫자 자료를 저장하기 위한 필드  
+
+
+geo_distance 패싯  
+특정 위치에서 떨어진 거리에 포함되는 다큐먼트 수에 대한 정보 제공  
+```
+{
+    "query': { "match_all": {}},
+    "facets": {
+        "spatial_test": {
+            "geo_distance": {
+                "location": {
+                    "lat": 10.0,
+                    "lon": 10.0
+                },
+                "ranges": [
+                    { "to": 10 },
+                    { "from": 10, "to": 100 },
+                    { "from": 100 }
+                ],
+                "unit": "mi",
+                "distance_type": "plane"  #arc: 정밀한 계산, plane 빠른 계산
+            }
+        }
+    }
+}
+```
+
+
+패싯 결과 필터링  
+복수 값인 tags 필드에 대한 계산된 패싯에 fashion 키워드가 있는 다큐먼트롤 범위를 좁힐때  
+```
+{
+    "query": { "match_all": {} },
+    "facets": {
+        "tags": {
+            "terms": { "field": "tags" },
+            "facet_filter": {
+                "term": { "tags": "fashion" }
+            }
+        }
+    }
+}
+```
+
+
+제안 기능  
+성능을 염두에 두고 사용자의 철자 오류 수정, 자동완성 구현  
+[https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-suggesters.html](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-suggesters.html)  
+
+
+제안 기능 타입  
+- term: 전달된 각 단어에 대해 올바른 내용을 돌려주는 제안  
+- phrase: 적절한 구를 반환하는 제안  
+- completion: 자동완성 결과를 제공하게 설계된 제안  
+
+
+제안 기능 예  
+키워드 철자가 잘못된 serlock holnes 구에 대한 제안 결과 얻기  
+```
+curl -XGET 'localhost:9200/library/_search?pretty' -d '
+{
+    "query": {
+        "match_all": {}
+    },
+    "suggest": {
+        "first_suggestion": {
+            "text": "serlock holnes",
+            "term": {
+                "field": "_all"
+            }
+        }
+    }
+}'
+```
+
+여러 제안을 얻고 싶을때  
+```
+curl -XGET 'localhost:9200/library/_search?pretty' -d '
+{
+    "query": {
+        "match_all": {}
+    },
+    "suggest": {
+        "first_suggestion": {
+            "text": "serlock holnes",
+            "first_suggestion": {
+                "term": {
+                    "field": "_all"
+                }
+            },
+            "second_suggestion": {
+                "term": {
+                    "field": "title"
+                }
+            }
+        }
+    }
+}'
+```
+결과 options 배결의 프로퍼티  
+- text: 제안 텍스트 정의  
+- score: 제안 점수 정의, 점수가 높을수록 제안 결과도 좋다  
+- freq: 제안 빈도정의, 다큐먼트에 해당 단어가 얼마나 많이 등장하는지 표현  
+
+
