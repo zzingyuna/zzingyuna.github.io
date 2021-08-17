@@ -1268,4 +1268,177 @@ curl -XGET 'localhost:9200/docs/_search?pretty=true' -d
 }
 ```
 
+중요도를 질의에 추가  
+가장 중요한 필드 to, 덜 중요한 필드 from  
+```
+{
+    "query': {
+        "query_string": {
+            "fields": ["from^5", "to^10", "subject],
+            "query": "john",
+            "use_dis_max": false
+        }
+    }
+}
+```
+
+
+constant_score 질의  
+필터나 질의를 받아 점수로 사용하는 값을 명시적으로 설정, boost 매개변수를 이용해 일치하는 다큐먼트마다 점수 부여  
+```
+{
+    "query": {
+        "constant_score': {
+            "query": {
+                "query_string": {
+                    "query": "available:false author:heller"
+                }
+            }
+        }
+    }
+}
+```
+
+
+boosting 질의  
+일치하는 모든 다큐먼트의 점수를 줄이고 싶을 때 질의의 일부로 사용  
+```
+{
+    "query": {
+        "boosting': {
+            "positive": {
+                "term": {
+                    "available": true
+                }
+            },
+            "negative": {
+                "match": {
+                    "author": "remarque"
+                }
+            },
+            "negative_boost": 0.1
+        }
+    }
+}
+```
+
+
+function_score 질의  
+점수 계산에 비용이 들어갈 경우 유용, 필터링된 다큐먼트의 점수를 계산  
+```
+{
+    "query": {
+        "function_scroe": {
+            "query": { ... },
+            "filter": { ... },
+            "functions": [
+                {
+                    "filter": { ... },
+                    "FUNCTION": { ... }
+                }
+            ],
+            "boost_mode": "...",
+            "score_mode": "...",
+            "max_boost": "...",
+            "boost": ..."
+        }
+    }
+}
+```
+boost_mode: 질의 점수와 결합될 함수 질의 점수 계산 방법 정의  
+- multiply: 기본 동작 방식, 함수에서 계산된 점수를 질의 점수에 곱한다  
+- replace: 질의 점수를 완전히 무시하고 함수가 계산한 점수 반환  
+- sum: 질의 점수와 함수 점수를 합한다  
+- avg: 질의 점수와 함수 점수의 평균값  
+- max: 함수 점수와 질의 점수 중 최대값  
+- min: 함수 점수와 질의 점수 중 최소값  
+
+score_mode: 함수가 계산한 모든 점수를 결합하는 방법 정의  
+- multiply: 기본 동작 방식, 점수의 곱 반환  
+- sum: 점수의 합  
+- avg: 점수의 평균  
+- first: 다큐먼트와 일치하는 필터가 존재하는 첫 함수의 점수 반환  
+- max: 최대 점수
+- min: 최소 점수  
+
+
+functions 절에 포함할 수 있는 함수  
+- boost_factor: 다큐먼트의 점수에 주어진 값을 곱한다  
+- script_score: 반환하는 점수를 계산하기 위해 스크립트를 사용  
+- random_score: 초기 seed 값을 명세해 가상 난수 점수롤 생성  
+- decay: 거리가 멀어짐에 따라 decay 함수가 계산한 점수도 낮아진다, 특정 지점에서 거리를 기준으로 중요도를 높이는 경우 사용  
+
+
+향후 지원이 중단될 질의  
+custom_boost_factor, custom_score, custom_filters_score  
+
+
+중요도 정의  
+- 입력 자료 필드의 중요도 정의  
+```
+{
+    "title": "The Complete Sherlock Holmes",
+    "author": {
+        "_value": "Arthur Conan Doyle",
+        "_boost": 10.0
+    },
+    "year": 1936
+}
+```
+- 매핑에서 중요도 정의  
+```
+{
+    "mappings": {
+        "book": {
+            "properties": {
+                "title": { "type": "string" },
+                "author": { "type": "string", "boost": 10.0 }
+            }
+        }
+    }
+}
+```
+
+
+동의어 파일 시스템 설정  
+```
+"filter": {
+    "synonym": {
+        "type": "synonym",
+        "synonyms_path": "synonym.txt"
+    }
+}
+```
+
+
+동의어 확장  
+```
+"filter": {
+    "synonym": {
+        "type": "synonym",
+        "expand": true,
+        "synonym": ["one", "two", three"]
+    }
+}
+```
+expand 설정을 false로 했을때 one, two three => one 이었다면,  
+expand 설정을 true로 했을때 one, two three => one, two three 이 된다.  
+
+
+WordNet 동의어 사용  
+[https://wordnet.princeton.edu/](https://wordnet.princeton.edu/)  
+
+
+aggs(aggregations) 프로퍼티 = 집계 질의  
+숫자 집계  
+min, max, sum, avg 집계  
+스크립트 사용  
+value_count 집계  
+stats와 extended_stats 집계  
+버킷 bucketing aggrgation 집계  
+terms 집계  
+range 집계  
+date_range 집계  
+ip_range 집계  
+missing 집계  
 
