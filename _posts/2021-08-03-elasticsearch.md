@@ -1441,4 +1441,9 @@ range 집계
 date_range 집계  
 ip_range 집계  
 missing 집계  
+nested 집계  
+histogram 집계  
+date_histogram 집계  
+geo_distance 집계  
+geohash_grid 집계: [https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html)  
 
