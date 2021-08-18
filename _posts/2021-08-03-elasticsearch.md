@@ -1814,4 +1814,296 @@ curl -XGET 'localhost:9200/library/_search?pretty' -d '
 - score: 제안 점수 정의, 점수가 높을수록 제안 결과도 좋다  
 - freq: 제안 빈도정의, 다큐먼트에 해당 단어가 얼마나 많이 등장하는지 표현  
 
+term 제안  
+문자열 에디트 거리 string edit distance 기반  
+term 제안 옵션  
+- text: 제안 결과를 얻고싶은 텍스트  
+- field: 제안 결과를 생성할 필드  
+- analyzer: 분석기 이름  
+- size: 기본값 5, 제공되는 키워드를 대상으로 반환할 최대 제안 수  
+- sort: 결과에 대한 정렬 방법(score, frequency)  
+
+추가 옵션  
+- lowercase_terms: true로 설정하면 분석 직후 text 필드에서 생성한 모든 키워드를 소문자로 만든다  
+- max_edits: 기본값 2, 최대 에디트 거리  
+- prefix_len: 기본값 1
+- min_word_len: 기본값 4, 최소 제안 글자 수  
+- shard_size: 기본값이 size 매개변수로 지정된 값, 각 샤드에서 읽어햐 하는 제안 최대 수  
+
+
+phrase 제안  
+term 제안 기능 위에 구에 대한 계산 논리 추가  
+제공 옵션  
+- lowercase_terms: true로 설정하면 분석 직후 text 필드에서 생성한 모든 키워드를 소문자로 만든다  
+- max_edits: 기본값 2, 최대 에디트 거리  
+- prefix_len: 기본값 1
+- min_word_len: 기본값 4, 최소 제안 글자 수  
+- shard_size: 기본값이 size 매개변수로 지정된 값, 각 샤드에서 읽어햐 하는 제안 최대 수  
+- max_errors: 교정을 위해 오류가 발생할 수 있는 키워드 최대 수  
+- separator: 기본값은 여백문자, 키워드를 바이그램 bigram 필드로 나누기 위해 사용될 구분자 명세  
+
+
+completion 제안  
+자동완성 기능 색인 생성 예  
+```
+curl -XPOST 'localhost:9200/authors' -d '
+{
+	"mappings": {
+        "author": {
+            "properties": {
+                "name": { "type": "string" },
+                "ac": {
+                    "type": "completion",
+                    "index_analyzer": "simple",
+                    "search_analyzer": "simple",
+                    "payloads": true
+                }
+            }
+        }
+    }
+}'
+
+
+curl -XPOST 'localhost:9200/authors/author/1' -d '
+{
+	"name": "Fyodor Dostoevsky",
+    "ac": {
+        "input": [ "fyodor", "dostoevsky" ],
+        "output": "Fyodor Dostoevsky",
+        "payload": { "books": [ "123", "124"] },  #payload: 추가정보 제공
+        "weight": 30   #weight: 제안의 가중치, 높을수록 중요도가 높아진다
+    }
+}'
+```
+
+
+예상 검색(percolator)  
+```
+curl -XPOST 'localhost:9200/notifier' -d '
+{
+    "mappings": {
+        "book": {
+            "properties": {
+                "abailable": { "type": "boolean" }
+            }
+        }
+    }
+}'
+```
+예상 검색에 등록된 질의도 도큐먼트 이므로 percolator 색인에 저장될 질의 중 예상 검색에 사용된 질의를 선택하기 위해  
+엘라스틱서치에 일반적인 질의를 전송할 수 있다  
+예상 검색은 has_child, top_children, has_parent, nested와 같은 질의는 사용할 수 없다  
+
+
+색인된 다큐먼트 예상 검색  
+```
+curl -XGET 'localhost:9200/library/book/1/_precolate?precolate_index=notifier'
+```
+이미 색인된 library 도큐먼트와 일치하는 질의가 있는지 precolate_index 매개변수로 정의한 예상 검색 색인에 대해 점검  
+
+
+
+파일 내용 검색  
+애플리케이션에 논리 logic를 추가해 파일을 가져와 중요한 정보를 추출하고 json 객체를 생성해 엘라스틱 서치에 색인하는 방법  
+```
+bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/2.0.0.RC1
+
+설치 후 매핑을 따르는 색인 준비
+
+{
+    "mappings": {
+        "file": {
+            "properties": {
+                "note": { "type": "string", "store": "yes" },              #사용할 이름
+                "book": {
+                    "type": "attachment",
+                    "fields": {
+                        "file": { "store": "yes", "index": "analyzed" },   #파일 내용
+                        "date": { "store" :"yes" },                        #파일 생성날짜
+                        "author": { "store": "yes" },                      #파일 작성자
+                        "keywords": { "store": "yes" },                    #다큐먼트와 연결된 키워드
+                        "content_type": { "store": "yes" },                #다큐먼트의 MIME 타입
+                        "title": { "store": "yes" }                        #다큐먼트 제목
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+
+파일 내용을 json 구조체에 포함하기 위해 base64 알고리즘으로 파일 내용 인코딩  
+```
+base64 -i example.docx -o example.docx.base64
+```
+
+
+
+Geo 공간 검색(spatial search)  
+거리 기반 정렬 예  
+```
+{
+    "query": {
+        "match_all": {}
+    },
+    "sort": [
+        {
+            "_geo_distance": {
+                "location": "48.8567, 2.3508",
+                "unit": "km"
+            }
+        }
+    ]
+}
+```
+
+bounding_box 필터링 예  
+```
+{
+    "filter": {
+        "geo_bounding_box": {
+            "location": {
+                "top_left": "52.4796, -1.903",
+                "bottom_right: "48.8567, 2.3508"
+            }
+        }
+    }
+}
+```
+
+거리 제한 예  
+```
+{
+    "filter": {
+        "geo_distance": {
+            "location": "48.8567, 2.3508",
+            "distance": "500km"
+        }
+    }
+}
+```
+
+
+공간검색 임의의 형태  
+```
+#매핑 추가
+{
+    "poi": {
+        "properties": {
+            "name": { "type": "string", "index": "not_analyzed" },
+            "location": { "type": "geo_shape" }
+        }
+    }
+}
+
+# point
+{
+    "location": {
+        "type": point",
+        "coordinates": [-0.1275, 51.507222]
+    }
+}
+
+# envelope
+{
+    "type": "envelope",
+    "coordinates": [
+        [-0.087890625, 51.50874245880332],
+        [2.4169921875, 48.80686346108517]
+    ]
+}
+
+# polygon
+{
+    "type": "polygon",
+    "coordinates": [
+        [-7.250977, 55.124723],
+        [1.845703, 51.500194],
+        [-7.250977, 55.124723]
+    ]
+}
+
+# multipolygon
+{
+    "type": "multipolygon",
+    "coordinates": [
+        [
+            [-7.250977, 55.124723],
+            [1.845703, 51.500194],
+            [-7.250977, 55.124723]
+        ],
+        [
+            [-0.087890625, 51.50874245880332],
+            [2.4169921875, 48.80686346108517],
+            [3.88916015625, 51.01375465718826],
+            [-0.087890625, 51.50874245880332]
+        ]
+    ]
+}
+
+# 용례
+{
+    "filter": {
+        "geo_shape": {
+            "location": {
+                "shape": {
+                    "type": "polygon",
+                    "coordinates: [
+                        [
+                            [-0.087890625, 51.50874245880332],
+                            [2.4169921875, 48.80686346108517],
+                            [3.88916015625, 51.01375465718826],
+                            [-0.087890625, 51.50874245880332]
+                        ]
+                    ]
+                }
+            }
+        }
+    }
+}
+```
+
+
+색인에 형태 저장  
+예) 한국의 경계  
+```
+# 매핑 정의
+{
+    "country": {
+        "properties": {
+            "name": { "type": "string", "index": "not_analyzed" },
+            "area": { "type": "geo_shape" }
+        }
+    }
+}
+
+# 검색
+{
+    "filter": {
+        "geo_shape": {
+            "location": {
+                "indexed_shape": {
+                    "index": "countries",
+                    "type": "country",
+                    "path": "area",
+                    "id": "1"
+                }
+            }
+        }
+    }
+}
+```
+
+
+스크롤 API  
+스크롤 관련 정보와 결과에 대한 정보를 엘라스틱서치라 얼마나 오랫동안 보존해야 할지 제안하는 값  
+질의 전송 예  
+```
+curl -XGET 'localhost:9200/library/_search?pretty&scroll=5m' -d '{ "query": { "match_all": {} } }'
+```
+엘라스틱서치는 종단점 _search/scroll 제공  
+scroll_id 를 사용해 다음 이어지는 페이지를 얻을 수 있다  
+해당 핸들은 일정 시간동안만 유효하므로 지정 시간이 지나면 무효화된 값이되어 오류 응답을 반환한다  
+
 
