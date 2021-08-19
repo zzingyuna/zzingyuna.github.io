@@ -2107,3 +2107,137 @@ scroll_id 를 사용해 다음 이어지는 페이지를 얻을 수 있다
 해당 핸들은 일정 시간동안만 유효하므로 지정 시간이 지나면 무효화된 값이되어 오류 응답을 반환한다  
 
 
+
+terms 필터  
+```
+{
+    "query": {
+        "constant_score": {
+            "filter": {
+                "terms": {
+                    "title": [ "crime", "punishment" ],
+                    "execution": "plain"
+                }
+            }
+        }
+    }
+}
+```
+execution 매개변수  
+- plain: 기본값, 결과를 비트셋에 저장하고 캐시  
+- fielddata: 키워드를 비교하기 위해 fielddata 캐시를 사용, 키워드를 대량으로 필터링 할때 효율적  
+- bool: 각 키워드마다 term 필터 생성하고 거기에 bool 필터 생성, 캐시안됨
+- and:bool: 값과 유사하지만, bool 필터 대신 and 필터 생성  
+- or:bool: 값과 유사하지만, bool 필터 대신 or 필터 생성  
+
+
+키워드 탐색  
+```
+"filter": {
+    "terms": {
+        "id": {
+            "index": "books",              # 메모리에 올릴 색인
+            "type": "book",                # 관심 있는 타입
+            "id": "3",                     # 다큐먼트 식별자
+            "path": "similar",             # 키워드를 메모리에 올릴 필드 이름
+            "routing": "",                 # 키워드를 필터에 올릴 때 라우팅값
+            "cache": true                  # 기본값 true, 캐시할지 여부
+        },
+        "_cache_key": "books_3_similar"
+    }
+}
+```
+execution 매개변수는 고려하지 않음  
+
+
+키워드 탐색 캐시 설정  
+elasticsearch.yml 파일에서 아래 프로퍼티 설정  
+indices.cache.filter.terms.size: 기본값 10mb, 키워드 탐색 캐시를 위해 사용 가능한 총 메모리양  
+indices.cache.filter.terms.expire_after_access: 마지막 접근 후 만료되어야 하는 시간  
+indices.cache.filter.terms.expire_after_write: 캐시에 들어간 후 만료되어야 하는 최대 시간  
+
+
+
+클러스터 형성과 노드 검색 과정:탐색 discovery  
+기본 젠(zen) 탐색 모듈 사용, 멀티캐스트와 유니캐스트 지원  
+멀티캐스트/유니캐스트 [http://guruble.com/elasticsearch-3-node-discovery/](http://guruble.com/elasticsearch-3-node-discovery/)  
+
+
+
+##### elasticsearch.yml 프로퍼티  
+> node.master: true  
+마스터 노드로 동작  
+> node.data: true  
+자료를 담는 노드로 동작  
+> discovery.zen.minimum_master_nodes  
+서로 연결되어야 하는 마스터로 승격이 가능한 노드의 최소 수 정의  
+> cluster.name  
+기본 이름 elasticsearch  
+
+> discovery.zen.ping.multicast.enabled  
+멀티캐스트 활성화 여부   
+> discovery.zen.ping.multicast.group  
+멀티캐스트 요청을 위해 사용할 그룹 주소, 기본값 224.2.2.4  
+> discovery.zen.ping.multicast.port  
+멀티캐스트 요청을 위해 사용될 포트, 기본값 54328  
+> discovery.zen.ping.multicast.ttl  
+멀티캐스트 요청이 유효한 시간, 기본값 3초     
+> discovery.zen.ping.multicast.address  
+엘라스틱서치가 바인드할 주소, 기본값 null  
+
+> discovery.zen.ping.unicast.hosts  
+유니캐스트를 사용하기 위해 클러스터를 형성하는 모든 호스트 명세  
+```
+discovery.zen.ping.unicast.hosts: 192.168.2.1:[9300-9399], 192.168.2.2:[9300-9399]
+```
+
+> discovery.zen.fd.ping_interval  
+노드가 동작하고 응답하는지 점검하기 위해 전송되는 시그널(핑ping) 주기, 기본값 1s(1초)  
+> discovery.zen.fd.ping_timeout  
+기본값 30s(30초), 핑 응답을 기다릴 시간  
+> discovery.zen.fd.ping_retries  
+기본값 3, 재시도 수  
+
+
+게이트웨이 모듈  
+색인과 색인 내부에 저장된 자료, 타입 매핑이나 색인 수준의 설정 등 클러스터 자료와 메타데이터를 영속적으로 저장,  
+매번 클러스터를 시작할 때마다 게이트웨이에서 읽으며 클러스터에 변경을 가할 때 게이트웨이 모듈을 사용해 영속적으로 저장  
+elasticsearc.yml 파일 설정  
+> gateway.type: local  
+색인과 메타데이터를 지역 파일시스템에 저장  
+fs, hdfs, s3 옵션이 있다  
+
+
+복구  
+모든 샤드와 레플리카를 초기화하는 과정, 트랜잭션 로그에서 모든 자료를 읽어 샤드에 적용  
+> gateway.expected_nodes: 10  
+엘라스틱서치는 클러스터에 속한 노드 수가 10이 되면 즉시 복구 프로세스 시작  
+> gateway.recover_after_nodes: 8  
+프로퍼티에 설정된 값과 클러스테에 합류한 노드 수가 8이 된 직후 복구 시작  
+> gateway.recover_after_time: 10m  
+클러스터가 형성된 다음 10분 후 게이트웨이 복구  
+> gateway.recover_after_master_nodes  
+마스터로 승격이 가능한 자격을 갖춘 노드가 얼마나 많이 존재해야 복구 가능한지 명세  
+> gateway.recover_after_data_nodes  
+클러스터 자료 노드가 얼마나 많이 존재해야 복구 가능한지 명세  
+> gateway.expected_master_nodes  
+마스터로 승격이 가능한 자격을 갖춘 노드가 얼마나 많이 존재해야 복구 가능한지 명세  
+> gateway.expected_data_nodes  
+클러스터에 자료 노드가 얼마나 많이 존재해야 하는지 명세  
+
+
+필터 캐시  
+- 노드 필터 캐시
+단일 노드에 할당된 모든 색인을 대상으로 공유  
+indices.cache.filter.size로 주어진 전체 메모리 중 특정 비율이나 특정 양을 사용하게 구성  
+- 색인 필터 캐시
+최종 크기를 예측하기 어렵다  
+
+indices.fielddata.cache.size  
+필드 자료 캐시에 할당한 메모리양 설정, 절대값(2GB) 혹은 퍼센트(40%)로 설정가능  
+
+indices.fielddata.cache.expire  
+최대 비활성 시간 설정, 분 (10m)으로 설정 가능  
+
+indices.fielddata.breaker.limit  
+기본값 80%, 필드 자료 회로 차단기 ciruit breaker로 프로세스에 할당한 힙 메모리 중 80퍼센트 이상을 요구하는 즉시 예외를 던진다  
