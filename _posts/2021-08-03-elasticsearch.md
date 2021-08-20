@@ -2185,6 +2185,32 @@ indices.cache.filter.terms.expire_after_write: 캐시에 들어간 후 만료되
 > discovery.zen.ping.multicast.address  
 엘라스틱서치가 바인드할 주소, 기본값 null  
 
+> indices.memory.index_buffer_size  
+기본값 100%, 특정 노트에 존재하는 모든 색인의 샤드 사이에서 나눠 사용할 수 있는 전체 메모리 양 제어  
+> indices.memory.min_shard_index_buffer_size  
+기본값 4mb, 샤드별 최소 색인 버퍼값 설정  
+
+> index.refresh_interval  
+기본값 1s(1초), 색인 검색기 객체는 얼마나 자주 새로 고쳐야 하는지명세  
+
+> threadpool.index.type: cache  
+들어오는 요청에 대해 스레드를 생성하는 한계가 없는 스레드 풀  
+> threadpool.index.type: fixed  
+크기가 고정된 스레드 풀  
+
+> threadpool.index  
+색인과 삭제 연산에 쓰인다. 기본값의 타입은 fixed, 크기는 가용 프로세서 수, 큐 크기는 300  
+> threadpool.search  
+검색과 수를 세기 위한 요청에 쓰인다. 기본값의 타입은 fixed, 크기는 가용 프로세서 수*3, 큐 크기는 1000  
+> threadpool.suggest  
+제안 요청을 위한 스레드, 기본값의 타입은 fixed, 크기는 가용 프로세서 수, 큐 크기는 1000  
+> threadpool.get  
+실시간 get 요청에 쓰인다. 기본값의 타입은 fixed, 크기는 가용 프로세서 수, 큐 크기는 1000  
+> threadpool.bulk  
+대량 연산을 위한 스레드 풀,  기본값의 타입은 fixed, 크기는 가용 프로세서 수, 큐 크기는 50  
+> threadpool.percolate  
+예상 검색 요청을 위한 스레드 풀, 기본값 타입은 fixed, 크기는 가용 프로세서 수, 큐 크기는 1000
+
 > discovery.zen.ping.unicast.hosts  
 유니캐스트를 사용하기 위해 클러스터를 형성하는 모든 호스트 명세  
 ```
@@ -2240,4 +2266,177 @@ indices.fielddata.cache.expire
 최대 비활성 시간 설정, 분 (10m)으로 설정 가능  
 
 indices.fielddata.breaker.limit  
-기본값 80%, 필드 자료 회로 차단기 ciruit breaker로 프로세스에 할당한 힙 메모리 중 80퍼센트 이상을 요구하는 즉시 예외를 던진다  
+기본값 80%, 차단기 동작을 위한 프로퍼티, 필드 자료 회로 차단기 ciruit breaker로 프로세스에 할당한 힙 메모리 중 80퍼센트 이상을 요구하는 즉시 예외를 던진다  
+
+indices.fielddata.breaker.overhead  
+기본값 1.03, 차단기 동작을 위한 프로퍼티, 필드를 대상으로 원래 추정한 값에 보정을 위해 곱해야 할 상수값 정의  
+
+
+
+저장소 타입 설정  
+> index.store.type: simplefs  
+임의 접근 파일을 사용해 색인 파일에 접근하는 디스크 기반 저장소  
+> index.store.type: niofs  
+색인 파일에 접근하기 위해 자바 NIO 클래스를 사용하는 디스크 기반 색인 저장소  
+> index.store.type: mmapfs  
+mmap을 사용해 메모리에 색인 파일을 매핑하는 디스크 기반 저장소  
+> index.store.type: memory  
+색인을 RAM 메모리에 저장  
+
+
+* 주의사항  
+- 일반적으로 엘라스틱서치 운영 중인 jvm 프로세스에 전체 가용 메모리의 50~60 퍼센트를 넘어가는 메모리 할당 금지  
+- jvm 힙 크기 재조정을 피하기 위해 Xmx, Xms 인수를 동일 값으로 설정하는 것이 바람직  
+- 일반적으로 64비트 운영체제를 사용한다면 mmafs 선택, 유닉스 기반 시스템에서는 niofs를 윈도 기반 시스템에서는 simplefs 선택  
+- 색인 새로고침 주기는 되도록 길게 설정  
+- 스레드 풀 조율  
+- 병합 과정 조율, 질의를 빠르게 하려면 색인에 대한 세그먼트 수를 줄여야 한다, 색인이 빨라지려면 색인에 대한 세그먼트 수를 늘려야 한다 양쪽의 절충 지점을 찾아 내는것이 중요  
+- 필드 자료 캐시에 한계가 없어 메모리 부족 오류 문제 방지를 위해 필드 자료 캐시 크기를 제한하거나 회로 차단기를 사용해 예외를 던지도록 처리  
+- 색인을 위한 RAM 버퍼는 10 퍼센트 정도를 기본으로 설정한다  
+- 트랜잭션 로깅 조율, 트랜잭션 로그에 쌓인 정보를 처리하여 샤드 초기화가 느려지는 현상 개선  
+
+
+트랜잭션 로깅 traslog  
+샤드별 구조체로 로그 선행 기입 목적으로 사용된다  
+최대 5,000개 연산을 200mb 크기까지 보존  
+index.translog.flush_threshold_ops: 트랜잭션 로그에 저장될 최대 연산 수  
+index.translog.flush_threshold_size: 트랜잭션 로그의 최대 크기  
+
+
+템플릿  
+새로 생성되는 색인 이름과 비교하기 위한 패턴을 정의  
+```
+curl -XPUT http://localhost:9200/_template/main_template?pretty -d '
+{
+    "template": "*",
+    "order": 1,
+    "settings": {
+        "index.number_of_replicas": 0
+    },
+    "mappings": {
+        "_default": {
+            "_source": {
+                "enabled": false
+            }
+        }
+    }
+}'
+```
+위와 같이 템플릿을 지정하면 생성되는 모든 색인은 레플리카가 없으며 원본도 저장하지 않는다  
+템플릿은 파일로 저장 가능하며 config/templates 디렉터리에 위치해야 한다  
+
+
+동적 템플릿  
+```
+{
+    "mapping": {
+        "article": {
+            "dynamic_templates": {
+                "match": "*",    # 필드 이름이 패턴과 일치할때 해당 템플릿 사용, *이라 모든 필드에 적용됨, unmatch 값도 사용가능(필드 이름이 패턴과 일치하지 않을때 해당 펨플릿 사용)
+                "mapping": {
+                    "type": "string",
+                    "index": "analyzed",
+                    "fields": {
+                        "str": { "type": "{dynamic_type}", "index": "not_analyzed" }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+각 필드는 복수 값 필드로 취급되며 첫번째 필드 타입은 문자열, 두번째 필드는 엘라스틱서치가 타입을 판단하는 article 타입을 위핸 매핑정의  
+glob 패턴을 사용하며 match_pattern=regexp 를 사용해 패턴 변경 가능 (정규표현식 사용가능)  
+중첩된 다큐먼트 이름이 일치하는지 path_match, path_unmatch를 사용하여 정의 가능  
+
+
+스냅샷  
+생성한 시점의 해당 클러스터 관련 자료, 색인에대한 정보 보존  
+name: 저장소 이름  
+type: 저장소 타입(fs, url)  
+settings: 타입을 fs로 설정했을 경우 location, url로 설정했을 경우 url 추가 정보 필요  
+```
+# 스냅샷 저장소 생성
+curl -XPUT localhost:9200/_snapshot/backup -d '
+{
+    "type": "fs",
+    "settings": {
+        "location": "/tmp/es_backup_folder/cluster1"
+    }
+}'
+
+# 스냅샷 생성
+curl -XPUT localhost:9200/_snapshot/backup/bckp1?wait_for_completion=true&pretty
+스냅샷 생성 후 응답을 받기 위해 wait_for_completion 매개변수 사용
+```
+> curl -XGET localhost:9200/_snapshot/backup?pretty  
+저장소 정의 확인  
+> curl -XGET localhost:9200/_snapshot/_all?pretty  
+모든 저장소 점검  
+> curl -XDELETE localhost:9200/_snapshot/backup?pretty  
+스냅샷 저장소 삭제  
+
+
+스냅샷 생성시 매개변수  
+- indices: 스냅샷을 찍길 원하는 색인 이름  
+- ignore_unabailable: false로 설정하면 indices 매개변수가 존재하지 않는 색인을 가리키는 경우 명령 실패  
+- include_global_state: 기본값 true, 클러스터 상태를 스냅샷에 기록  
+- partial: true로 설정하면 사용 가능한 샤드 관련 내용만 저장 나머지는 생략  
+
+
+스냅샷 복구  
+> curl -XPOST 'localhost:9200/_snapshot/backup/bckp1/_restore'  -d '{ "indices": "c*" }'  
+c 글자로 시작하는 색인만 복구  
+다른 매개변수  
+- ignore_unavailable: 스냅샷 생성과 동일  
+- include_global_state: 스냅샷 생성과 동일  
+- rename_pattern: 스냅샷에 저장된 색인 이름 변경, 정규표현식 값 사용  
+- rename_replacement: rename_pattern과 함께 목표 색인 이름 정의  
+
+
+클러스터 상태 API  
+> curl 'localhost:9200/_cluster/health?pretty'  
+> curl 'localhost:9200/_cluster/health/test1,test2?pretty'  
+녹색 상태: 모든 샤드가 적절히 할당되었으며 오류가 없음  
+황색 상태: 요청을 처리할 준비가 되있음, 주 샤드가 할당되었지만 몇몇 레플리카는 할당되지 않은 상태  
+적색 상태: 주 샤드 하나가 할당되지 않았음, 클러스터가 아직 준비되지 않은 상태  
+
+
+> curl 'localhost:9200/_cluster/health?level=indices'  
+클러스터 정보 외에 색인별 상태 정보 확인 가능  
+> curl 'localhost:9200/_cluster/health?level=shards'  
+샤드별 정보 확인 가능  
+
+
+> curl 'localhost:9200/_cluster/health?timeout=30s'  
+해당 명령이 최대 30초 동안 기다려 응답 반환  
+> curl 'localhost:9200/_cluster/health?wait_for_status=yellow'  
+상태 api 호출을 클러스터 상태가 yello 상태가 될때 결과 반환  
+> curl 'localhost:9200/_cluster/health?wait_for_nodes>=3'  
+응답을 반환하기 위해 필요한 노드 수 설정, 노드가 3개 이상일 때  
+> curl 'localhost:9200/_cluster/health?wait_for_relocating_shard=0'  
+엘라스틱서치에 기다려야 하는 재배치 중인 샤드 수를 알려준다, 0으로 설정하면 재배치 중인 모든 샤드를 기다린다  
+
+> curl localhost:9200/library,map/_stats?pretty  
+응답 결과 구조  
+map, library 의 색인에 대한 통계 확인,  
+indices(색인에 대한 정보)  
+- docs: 다큐먼트 count, deleted 정보, 세그먼트 병합과정에서 다큐먼트가 물리적으로 삭제 그전까지 deleted에 카운팅  
+- store: 색인크기, 속도 조절 통계 등의 정보  
+- indexing: 색인과 삭제 자료 처리 정보  
+- get: 실시간 get 정보, 성공하지 못한 전체 결과 수 등  
+- search: 검색 정보  
+- merges: 루씬 세그먼트 병합에 대한 정보  
+- refresh: 새로 고침 연산에 대한 정보  
+- flush: 플러시에 대한 정보  
+- warmer: 색인 미리 채우기와 수행 시간에 대한 정보  
+- filter_cache: 필터 캐시 통계  
+- id_cache: 식별자 캐시 통계  
+- fielddata: 필드 자료 캐시 통계  
+- percolate: 예상 검색에 대한 정보  
+- completion: 자동완성 기능에 대한 정보  
+- segments: 루씬 세그먼트에 대한 정보  
+- translog: 트랜잭션 로그 수와 크기에 대한 정보
+primaries(노드에 할당된 주 샤드 정보), 
+total(레플리카를 포함한 모든 샤드에 대한 정보)  
+
