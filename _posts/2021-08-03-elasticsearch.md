@@ -2217,6 +2217,39 @@ indices.cache.filter.terms.expire_after_write: 캐시에 들어간 후 만료되
 discovery.zen.ping.unicast.hosts: 192.168.2.1:[9300-9399], 192.168.2.2:[9300-9399]
 ```
 
+> cluster.routing.allocation.allow_rebalance  
+always: 필요한 즉시 균형잡기 바로 시작  
+indices_primaries_active: 모든 주 샤드가 초기화되고 균형잡기 시작  
+indices_all_active: 기본값, 모든 샤드와 레플리카가 초기화되고 나서 균형잡기 시작  
+> cluster.routing.allocation.cluster_concurrent_rebalance  
+전체 클러스터를 대상으로 한 번에 노드 사이에서 옮길 수 있는 샤드 수 지정  
+> cluster.routing.allocation.node_concurrent_recoveries  
+단일 노드에서 동시에 초기화하는 샤드 수 설정  
+> cluster.routing.allocation.node_initial_primaries_recoveries  
+노드에서 동시에 초기화하는 주 샤드 수 제어  
+> cluster.routing.allocation.enable  
+all: 기본값, 모든 샤드 유형을 할당할 수 있다  
+primaries: 주 샤드만 할당할 수 있다  
+new_primaries: 새롭게 생성된 주 샤드만 할당할 수 있다  
+none: 샤드 할당을 비활성화  
+> indices.recovery.concurrent_streams  
+샤드 집합에서 샤드를 복구하기 위해 한번에 노드에서 열릴 수 있는 스트림 수 제어  
+
+
+> node.zone  
+> index.routing.allocation.include.zone  
+> index.routing.allocation.exclude.zone #할당에서녿 배체  
+> index.routing.allocation.require.size #노드 할당 규칙  
+> index.routing.allocation.require.zone #노드 할당 규칙  
+> index.routing.allocation.include._ip #IP 기반 샤드 할당 활성화  
+> cluster.routing.allocation.disk.threshold_enabled #디스크 기반 샤드 할당 활성화  
+> cluster.info.update.interval #디스크 기반 샤드 할당 구성 방법1  
+> cluster.routing.allocation.disk.watermark.low #디스크 기반 샤드 할당 구성 방법2  
+> cluster.routing.allocation.disk.watermark.high #디스크 기반 샤드 할당 구성 방법3  
+> cluster.routing.allocation.include._ip #클러스터 IP기반 색인 배치  
+> index.routing.allocation.total_shards_per_node #단일 노드에 위치 가능한 샤드의 최대 수 지정  
+
+
 > discovery.zen.fd.ping_interval  
 노드가 동작하고 응답하는지 점검하기 위해 전송되는 시그널(핑ping) 주기, 기본값 1s(1초)  
 > discovery.zen.fd.ping_timeout  
@@ -2436,7 +2469,276 @@ indices(색인에 대한 정보)
 - percolate: 예상 검색에 대한 정보  
 - completion: 자동완성 기능에 대한 정보  
 - segments: 루씬 세그먼트에 대한 정보  
-- translog: 트랜잭션 로그 수와 크기에 대한 정보
-primaries(노드에 할당된 주 샤드 정보), 
+- translog: 트랜잭션 로그 수와 크기에 대한 정보  
+primaries(노드에 할당된 주 샤드 정보),  
 total(레플리카를 포함한 모든 샤드에 대한 정보)  
 
+
+노드정보 API  
+- 노드 이름: /_nodes/노드명
+- 노드 식별자: /_nodes/식별자코드
+- ip 주소: /_nodes/ip주소
+- 설정된 프로퍼티로 조회: /_nodes/프로퍼티명:값
+- 패턴: /_nodes/패턴이들어간문자열
+- 노드열거: /_nodes/노드1,노드2
+- 패턴과 노드열거: /_nodes/노드*
+- 엘라스틱서치 구성: /_nodes/노드명/settings
+- 서버 정보: /_nodes/노드명/os
+- 프로세스 식별자와 사용 가능한 파일 기술자: /_nodes/노드명/process
+- 자바 가상기계 정보: /_nodes/노드명/jvm
+- 스레드 풀 구성: /_nodes/노드명/thread_pool
+- 네트워크 인터페이스 정보: /_nodes/노드명/network
+- transport 모듈과 관련 정보: /_nodes/노드명/transport
+- http와 관련된 정보: /_nodes/노드명/http
+- 플러그인 정보: /_nodes/노드명/plugins
+- 노드 상태: /_nodes/노드명/stats
+- 크기, 다큐먼트수, 색인관련 통계: /_nodes/노드명/stats/indices
+- 운영체제 관련 통계 정보: /_nodes/노드명/stats/os
+- 메모리, CPU 등 통계 정보: /_nodes/노드명/stats/process
+- 자바 가상기계 통계 정보: /_nodes/노드명/stats/jvm
+- tcp 수준의 통계 정보: /_nodes/노드명/stats/network
+- transport 모듈이 송수신하는 자료 통계 정보: /_nodes/노드명/stats/transport
+- http연결에 대한 통계 정보: /_nodes/노드명/stats/http
+- 디스크 공간과 I/O연산 관련 통계 정보: /_nodes/노드명/stats/fs
+- 스레드 풀 상태 통계 정보: /_nodes/노드명/stats/thread_pool
+- 필드 자료 캐시의 회로 차단기에 대한 통계 정보: /_nodes/노드명/stats/breaker
+
+
+클러스터 상태 API  
+> curl 'localhost:9200/_cluster/state?pretty'  
+- /_cluster/state/version: 클러스터 버전 정보
+- /_cluster/state/master_node: 마스터 노드 정보
+- /_cluster/state/nodes: 노드에 대한 정보
+- /_cluster/state/routing_table: 라우팅에 대한 정보
+- /_cluster/state/metadata: 메타데이터에 대한 정보
+- /_cluster/state/blocks: 응답의 blocks 부분을 반환
+- /_cluster/pending_tasks: 실행을 기다리는 과업을 점검
+- /_cluster/segments: 전체 클러스터나 개별 색인 모두에 사용, 물리적인 색인과 연결된 세그먼트에 대한 정보  
+
+
+cat API  
+> curl -XGET 'localhost:9200/_cat/shards?v'  
+- /_cat/aliases: 앨리어스 정보
+- /_cat/aliases/앨리어스명: 지정한 앨리어스 정보
+- /_cat/allocation: 할당된 샤드와 디스크 사용량 정보
+- /_cat/count: 모든 색인이나 개별 색인에 대한 다큐먼트 수
+- /_cat/count/색인명: 지정한 색인에 대한 다큐먼트 수
+- /_cat/health: 클러스터 상태
+- /_cat/indices: 색인에 대한 정보
+- /_cat/indices/색인명: 지정한 색인에 대한 정보
+- /_cat/master: 마스터 노드 정보
+- /_cat/nodes: 클러스터 토플로지 cluster topology 정보
+- /_cat/pending_tasks: 실행을 위해 기다리고 있는 작업 정보
+- /_cat/recovery: 복구 과정에 대한 진행 상황
+- /_cat/thread_pool: 스레드 풀과 관련해 클러스터 범우 통계
+- /_cat/shards: 샤드에 대한 정보
+- /_cat/shards/색인명: 지정한 색인의 샤드에 대한 정보
+
+
+* 엘라스틱서치는 기본적으로 클러스터 상태가 바뀌어 균형잡기(rebalancing)가 필요하다 생각할때 클러스터의 특정 노드에서 다른 노드로 샤드를 이동한다.
+
+* 샤드와 레플리카 수동으로 옮기기  
+```
+# 1.샤드 옮기기
+curl -XPOST 'localhost:9200/_cluster/reroute' -d '{
+    "commands": [
+        {
+            "move": {
+                "index": "shop",
+                "shard": 1,
+                "from_node": "es_node_one",
+                "to_node": "es_node_two"
+            }
+        }
+    ]
+}'
+
+# 2.샤드 할당 취소
+curl -XPOST 'localhost:9200/_cluster/reroute' -d '{
+    "commands": [
+        {
+            "cancel": {
+                "index": "shop",
+                "shard": 0,
+                "from_node": "es_node_one"
+            }
+        }
+    ]
+}'
+
+# 3.샤드 강제 할당
+curl -XPOST 'localhost:9200/_cluster/reroute' -d '{
+    "commands": [
+        {
+            "allocate": {
+                "index": "users",
+                "shard": 0,
+                "from_node": "es_node_two"
+            }
+        }
+    ]
+}'
+
+# 단일 요청에 여러 명령으로
+curl -XPOST 'localhost:9200/_cluster/reroute' -d '{
+    "commands": [
+        {
+            "move": {
+                "index": "shop",
+                "shard": 1,
+                "from_node": "es_node_one",
+                "to_node": "es_node_two"
+            }
+        },
+        {
+            "cancel": {
+                "index": "shop",
+                "shard": 0,
+                "from_node": "es_node_one"
+            }
+        }
+    ]
+}'
+```
+
+
+색인 미리 채우기  
+```
+curl -XPUT 'localhost:9200/부모인색인명/색인명/_warmer/질의이름' -d '{
+    "query": {
+        "match_all": {}
+    },
+    "facets" {
+        "warming_facet": {
+            "terms": {
+                "field": "tags"
+            }
+        }
+    }
+}'
+```
+
+
+미리 채운 색인 질의 인출  
+```
+curl -XGET 'localhost:9200/색인명/_warmer/질의이름?pretty=true'
+curl -XGET 'localhost:9200/색인명/_warmer'
+curl -XGET 'localhost:9200/색인명/_warmer/tags*'
+```
+
+
+미리 채운 색인 질의 삭제  
+```
+curl -XDELETE 'localhost:9200/색인명/_warmer/질의이름'
+curl -XDELETE 'localhost:9200/색인명/_warmer/_all'
+curl -XDELETE 'localhost:9200/색인명/_warmer/tags*'
+```
+
+
+미리 채운 색인 질의 비활성화  
+> curl -XPUT 'localhost:9200/색인명/_settings' -d '{ "index.warmer.enabled": false }'  
+
+
+실행된 질의 정보 로그로 확인  
+1. elasticsearch.yml 파일에 아래 내용 입력  
+index.search.slowlog.threshold.query.warn: 10s  
+index.search.slowlog.threshold.query.info: 5s  
+index.search.slowlog.threshold.query.debug: 2s  
+index.search.slowlog.threshold.query.trace: 1s  
+2. logging.yml 파일에 아래 내용 입력  
+logger:  
+ index.search.slowlog: TRACE, index_search_slow_log_file  
+
+
+앨리어스  
+```
+# 생성
+curl -XPOST 'localhost:9200/_aliases' -d '{
+    "actions": [
+        { "add": { "index": "day10", "alias": "week12" } },
+        { "add": { "index": "day11", "alias": "week12" } },
+        { "add": { "index": "day12", "alias": "week12" } },
+    ]
+}'
+
+# 검색
+curl -XGET 'localhost:9200/day10,day11,day12/_search?q=test'
+
+# 변경
+curl -XPOST 'localhost:9200/_aliases' -d '{
+    "actions": [
+        { "remove": { "index": "day9", "alias": "week12" } }
+    ]
+}'
+
+# 명령 결합
+curl -XPOST 'localhost:9200/_aliases' -d '{
+    "actions": [
+        { "add": { "index": "day10", "alias": "week12" } },
+        { "remove": { "index": "day9", "alias": "week12" } }
+    ]
+}'
+
+# 모든 앨리어스 조회
+curl -XGET 'localhost:9200/day10/_aliases'
+curl -XGET 'localhost:9200/_aliases'
+
+# 삭제
+curl -XDELETE 'localhost:9200/data/_alias/client'
+
+# 필터링
+curl -XPOST 'localhost:9200/_aliases' -d '{
+    "actions": [
+        { "add": {
+            "index": "data",
+            "alias": "client",
+            "filter": { "term": { "clientId": "123" } }
+        } }
+    ]
+}'
+
+# 라우팅
+curl -XPOST 'localhost:9200/_aliases' -d '{
+    "actions": [
+        { "add": {
+            "index": "data",
+            "alias": "client",
+            "search_routing": "12345,12346,12347",
+            "index_routing": "12345"
+        } }
+    ]
+}'
+
+# 설정된 라우팅값 확인을 위한 조회
+curl -XGET 'localhost:9200/client/_search?q=test&routing=99999,12345'
+```
+
+
+플러그인  
+[https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugin-management.html](https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugin-management.html)  
+> bin/plugin -install elasticsearch/elasticsearch-lang-javascript/2.0.0.RC1  
+> bin/plugin -install lang-javascript -url file:///tmp/elasticsearch-lang-javascript-2.0.0.RC1.zip  
+
+
+자바 플러그인  
+es-plugin.properties가 담긴 .jar파일 포함  
+내장 http 서버가 사용할 사이트 부문을 포함 가능, _site 디렉터리 아래 위치해야 함  
+
+
+사이트 플러그인 (/_plugin/_plugin_name)  
+내장 http 서버가 제공하는 파일 집합으로 취급, 엘라스틱 동작 방식에 어떤 변경도 없음  
+
+
+플러그인 제거  
+> bin/plugin -remove river-mongodb  
+
+
+설정 갱신  
+재시동 할때까지만 유효한 설정  
+```
+curl -XPUT 'localost:9200/_cluster/settings' -d '{
+    "transient": { #임시 프로퍼티 설정, 영구=permanent
+        "PROPERTY_NAME": "PROPERTY_VALUE"
+    }
+}'
+```
