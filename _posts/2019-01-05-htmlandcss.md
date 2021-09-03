@@ -149,6 +149,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 
 
 #### HTML5에서 css로 대체된 태그
+{{< bootstrap-table table_class="table table-dark table-striped table-bordered" >}}
 | 태그명  | 속성  |
 |:------:|:------------|
 | caption, iframe, img, input, onject, legend, table, hr, div, h1, h2, h3, h4, h6, p, col, colgroup, tbody, td, tfoot, th, thead, tr | align |
@@ -166,6 +167,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 | hr | noshade, size |
 | li, ol, ul | type |
 | hr, table, td, tr, col, colgroup, pre | width |
+{{< /bootstrap-table >}}
 
 
 
