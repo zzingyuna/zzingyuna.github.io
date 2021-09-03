@@ -67,19 +67,19 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 | area  | rel | link 태그와 동일하게 만들기 위해 사용, 링크할 속성의 타입 지정 |
 | base  | target | a 태그와 속성을 동일하게 만들기 위해 링크된 문서가 표시될 문서를 지정하고자 할 때 사용 |
 | ol  | reverse | li 태그를 일련 번호가 큰 순서대로 표시 |
-|meta | charset | 문자 인코딩을 지정할 때 사용 |
-|input, select, textarea, button | autofocus | type 속성값이 hidden이 아닌 경우 지정가능, 페이지 로드 후 포커싱 |
-|input, textarea | placeholder | 입력 형식에 대한 힌트 제공 |
-|input, output, select, textarea, button fieldset | form | form에 id값을 적용, id 값을 갖는 폼과 함께 전송 |
-|input, textarea 등 폼 컨트롤 태그 | required | 폼을 전송할 때 반드시 입력해야 함을 지정가능 |
-|fieldset | disabled | fieldset 태그에 속한 모든 콘텐츠를 사용할 수 없도록 처리 |
-|input | autocomplete | 자동 완성 여부 지정 |
-|input | min | 최소값 지정 |
-|input | max | 최대값 지정 |
-|input | multiple | 다수 값의 입력 여부 지정 |
-|input | pattern | 값을 체크하는 정규 표현식 지정 |
-|input | step | 컨트롤의 증가 단위 값 지정 |
-|form | novaildate | 폼 컨트롤의 값을 체크하지 않고 전송 |
+| meta | charset | 문자 인코딩을 지정할 때 사용 |
+| input, select, textarea, button | autofocus | type 속성값이 hidden이 아닌 경우 지정가능, 페이지 로드 후 포커싱 |
+| input, textarea | placeholder | 입력 형식에 대한 힌트 제공 |
+| input, output, select, textarea, button fieldset | form | form에 id값을 적용, id 값을 갖는 폼과 함께 전송 |
+| input, textarea 등 폼 컨트롤 태그 | required | 폼을 전송할 때 반드시 입력해야 함을 지정가능 |
+| fieldset | disabled | fieldset 태그에 속한 모든 콘텐츠를 사용할 수 없도록 처리 |
+| input | autocomplete | 자동 완성 여부 지정 |
+| input | min | 최소값 지정 |
+| input | max | 최대값 지정 |
+| input | multiple | 다수 값의 입력 여부 지정 |
+| input | pattern | 값을 체크하는 정규 표현식 지정 |
+| input | step | 컨트롤의 증가 단위 값 지정 |
+| form | novaildate | 폼 컨트롤의 값을 체크하지 않고 전송 |
 | input, button | formaction, formenctype, formmethod, formnovaildate, formtarget| form 태그의 action, enctype, method, novaildate, target 속성들을 재정의 할 때 사용 |
 | menu | type, label | type 속성은 메뉴 형태를 지정할 때 사용, label 속성은 메뉴 명칭을 지정할 때 사용 |
 | style | scoped | style 태그에 의해 기술된 스타일을 style 태그의 부모 영역에 속한 자식 태그에 모두 적용시키고자 할 때 사용 |
@@ -150,7 +150,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 
 #### HTML5에서 css로 대체된 태그
 | 태그명  | 속성  |
-| :-----: | :----- |
+|:------:|:------------|
 | caption, iframe, img, input, onject, legend, table, hr, div, h1, h2, h3, h4, h6, p, col, colgroup, tbody, td, tfoot, th, thead, tr | align |
 | body | alink, link, text, vlink, background |
 | table, tr, td, th, body | bgcolor |
