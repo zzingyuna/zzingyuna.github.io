@@ -59,6 +59,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 
 
 #### HTML5에 새로 도입된 태그
+{{< bootstrap-table table_class="table table-dark table-striped table-bordered" >}}
 | 태그명  | 속성     |  설명  |
 | :-----: | :-----: | :----- |
 | a, area  | media | link 태그의 속성과 동일하게 만들기 위해 적용할 미디어 타입을 지정할때 사용 |
@@ -96,10 +97,12 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 | 모든 태그 | spellcheck | 맞춤법 검사 여부를 지정 |
 | 모든 태그 | accesskey | 단축키로 사용할 값을 지정 |
 | 모든 태그 | tabindex | 탭 키의 이동 순서를 지정할 때 사용 |
+{{< /bootstrap-table >}}
 
 
 
 #### HTML5에서 재정의한 태그
+{{< bootstrap-table table_class="table table-dark table-striped table-bordered" >}}
 | 태그명  | 설명  |
 | :-----: | :----- |
 | a  | href 속성 없이 사용 |
@@ -111,10 +114,12 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 | menu | 도큐먼트의 메뉴 항목을 제공할 때 사용 |
 | small | 세부 주석 및 법적 인쇄 문서에서 작은 인쇄 정보를 지정할 때 사용 |
 | strong | 콘텐츠의 중요성을 강조할 때 사용 |
+{{< /bootstrap-table >}}
 
 
 
 ##### 권장하지 않는 태그
+{{< bootstrap-table table_class="table table-dark table-striped table-bordered" >}}
 | 태그명  | 속성     |  설명  |
 | :-----: | :-----: | :----- |
 | img | border | 값이 0일 때만 사용하고 가급적 css 사용을 권장 |
@@ -128,10 +133,12 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 | isindex | | 폼 컨트롤을 통해 대체되어 배제 |
 | dir | | ul 태그로 대체되어 배제 |
 | noscript | | HTML 문법에서만 사용하고 XML 문법에서는 더이상 하용하지 않으므로 배제 |
+{{< /bootstrap-table >}}
 
 
 
 #### HTML5에서 더 이상 사용할 수 없거나 웹 브라우저가 호환성을 위해 처리하는 태그
+{{< bootstrap-table table_class="table table-dark table-striped table-bordered" >}}
 | 태그명  | 속성  |
 | :-----: | :----- |
 | a, link | nev, charset |
@@ -145,6 +152,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 | meta | scheme |
 | object | archive, classid, codebase, codetype, declare, standby |
 | param | valuetype, type |
+{{< /bootstrap-table >}}
 
 
 
@@ -172,6 +180,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 
 
 #### API
+{{< bootstrap-table table_class="table table-dark table-striped table-bordered" >}}
 | API  | 설명  |
 | :-----: | :----- |
 | 그래픽 | canvas 태그를 사용하며 지정된 영역에 2차원 그래픽 처리 지원 |
@@ -183,6 +192,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 | 웹 워커 | 백그라운드로 특정 작업을 수행하는 것을 지원 |
 | 위치 정보 | 디바이스 위치적 정보를 이용하는 것을 지원 |
 | 드래그 앤 드롭 | draggable 속성을 이용, 드래그 앤 드롭 기능을 지원 |
+{{< /bootstrap-table >}}
 
 
 

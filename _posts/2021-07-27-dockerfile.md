@@ -28,7 +28,7 @@ ctrl+P, ctrl+Q
 
 
 #### Bash 기본 문법  
-```
+{{< bootstrap-table table_class="table table-dark table-striped table-bordered" >}}
 | 문법              | 설명          |
 | :--------------: | :----------- |
 | >                | 출력 리다이렉션. 명령 실행 결과 저장 |
@@ -62,7 +62,7 @@ ctrl+P, ctrl+Q
 | printf           | 지정한 형식대로 값 출력.printf 80\\\\nuser\\\\ny \| ex-configPort:80User:userSave Configuration (y/n): y예를 들어 ex-config 파일은 Port,User,Save Configuration을 사용자에게 입력 받는 경우 printf로 값을 설정하여 넘겨주면 자동으로 값이 입력됨. |
 | sed              | 텍스트 파일에서 문자열 변경.sed -i "s/찾을문자열 바꿀문자열/g" 파일명 |
 | #                | 주석 |
-```
+{{< /bootstrap-table >}}
 
 
 
