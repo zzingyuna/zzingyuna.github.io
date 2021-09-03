@@ -11,9 +11,9 @@ layout: default
       <li>
 
         {% assign date_format = site.cayman-blog.date_format | default: "%Y-%m-%d" %}
-        <span class="post-meta">{{ date: date_format }}</span>
+        <span class="post-meta">{{ post.date | date: date_format }}</span>
 
-        <a style="font-size:12px;" href="{{ post.url | relative_url }}" title="{{ post.title }}">{{ post.excerpt }}</a>
+        <a style="font-size:12px;" href="{{ post.url | relative_url }}" title="{{ post.title }}">{{ post.excerpt | truncatewords: 30 }}</a>
 
       </li>
     {% endfor %}
