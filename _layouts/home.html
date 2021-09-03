@@ -13,7 +13,7 @@ layout: default
         {% assign date_format = site.cayman-blog.date_format | default: "%m-%d, %Y" %}
         <span class="post-meta">{{ date: date_format }}</span>
 
-        <a style="font-size:12px;" href="{{ post.url | relative_url }}" title="{{ post.title }}">{{ post.excerpt | markdownify }}</a>
+        <a style="font-size:12px;" href="{{ post.url | relative_url }}" title="{{ post.title }}">{{ post.excerpt }}</a>
 
       </li>
     {% endfor %}
