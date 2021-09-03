@@ -10,7 +10,7 @@ layout: default
     {% for post in site.posts %}
       <li>
 
-        {% assign date_format = site.cayman-blog.date_format | default: "%m-%d, %Y" %}
+        {% assign date_format = site.cayman-blog.date_format | default: "%Y-%m-%d" %}
         <span class="post-meta">{{ date: date_format }}</span>
 
         <a style="font-size:12px;" href="{{ post.url | relative_url }}" title="{{ post.title }}">{{ post.excerpt }}</a>
