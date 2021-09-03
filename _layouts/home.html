@@ -10,12 +10,10 @@ layout: default
     {% for post in site.posts %}
       <li>
 
-        {% assign date_format = site.cayman-blog.date_format | default: "%b %-d, %Y" %}
-        <span class="post-meta">{{ post.date | date: date_format }}</span>
+        {% assign date_format = site.cayman-blog.date_format | default: "%m-%d, %Y" %}
+        <span class="post-meta">{{ date: date_format }}</span>
 
-        <!--<span class="post-link">{{ post.title | escape }}</span>-->
-
-        <a style="font-size:12px;" href="{{ post.url | relative_url }}" title="{{ post.title }}">{{ post.excerpt | markdownify | truncatewords: 30 }}</a>
+        <a style="font-size:12px;" href="{{ post.url | relative_url }}" title="{{ post.title }}">{{ post.excerpt | markdownify }}</a>
 
       </li>
     {% endfor %}
