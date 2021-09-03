@@ -8,6 +8,7 @@ HTML5에서 문자 인코딩을 지시하는 방식에는 세가지가 있다
 1. 전송 단계에서 HTTP헤더에 Content_Type을 표시하여 전송하는 방법
 2. 문서 앞부분에 특수 유니코드 BOM(Byte Order Mark) 문자를 표시하여 인코딩에 대한 정보를 제공하는 방법
 3. 문서 파일의 초기 512바이트 크기 내에 meta 태그의 charset 속성으로 인코딩을 표시하는 방법
+
 ```
 즉 기존의
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">을 
