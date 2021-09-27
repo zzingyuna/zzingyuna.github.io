@@ -1446,7 +1446,7 @@ histogram 집계
 date_histogram 집계  
 geo_distance 집계  
 geohash_grid 집계: [https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html)  
-
+필터 쿼리: 필터 결과는 점수에 의해 정렬되지 않는다. 모든 결과에 대한 점수가 1.0 이므로..  
 
 
 집계 중첩 예  
