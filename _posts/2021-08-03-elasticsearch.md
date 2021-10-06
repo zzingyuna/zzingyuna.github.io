@@ -2742,3 +2742,64 @@ curl -XPUT 'localost:9200/_cluster/settings' -d '{
     }
 }'
 ```
+
+TF-IDF 유사도 알고리즘  
+오타 처리: fuzzy 질의  
+게이트웨이: 데이터를 디스크에 기록해서 노드가 내려가도 데이터를 잃지 않도록 하는 elasticsearch 구성 요소  
+
+수평적 확장: 클러스터에 노드 추가  
+수직적 확장: 노드에 자원 추가(CPU,메모리 등)  
+
+ElasticSearch head  
+ElasticSearch 플러그인, 어떻게 샤드가 클러스터에 분산되는지 보여줌  
+Chrome 확장 프로그램이나 Elasticsearch 플러그인(버전 5부터는 불가능)으로 실행되지 않을 때 Elasticsearch 에서 CORS 를 활성화해야 합니다. 그렇지 않으면 브라우저가 동일 출처 정책 위반으로 인해 elasticsearch-head의 요청을 거부합니다.  
+
+kopf  
+ElasticSearch API의 모든 잠재력을 탐색할 수 있는 REST 클라이언트를 제공  
+Kopf는 더 이상 유지되지 않습니다. 대체품(cerebro)이 개발되었으며 현재 https://github.com/lmenezes/cerebro 에서 유지 관리되고 있습니다 .  
+
+marvel  
+ElasticSearch에서 제공하는 모니터링 관련 플러그인. (유료)  
+
+색인 샘플  
+https://github.com/dakrone/elasticsearch-in-action  
+
+윈도우  
+https://cygwin.com/  
+curl, git 추가  
+
+압축 해제    rpm, deb 설치  
+config/ /etc/elasticsearch/  
+logs/ /var/log/elasticsearch/  
+
+메인 로그(cluster-name.log): ElasticSearch가 동작 중일 때 무슨 일이 일어났는지에 관한 일반적인 정보를 알 수 있다  
+느린 검색 로그(cluster-name_index_search_slowlog.log): 쿼리가 너무 느리게 실행될때 로그를 남긴다, 기본으로 0.5초 넘게 걸리면 로그  
+느린 색인 로그(cluster-name_index_indexing_slowlog.log): 색인 작업이 0.5초 이상 걸리면 로그  
+
+모든 로그를 남기고 싶다면 logging.yml 파일에 "rootLogger: TRACE, console, file" 입력  
+
+ElasticSearch에 의해 사용하는 메모리는 힙이라고 부른다  
+기본설정: 256MB 할당해서 1GB까지 확장, 실 서비스에서는 전체 RAM의 절반을 할당  
+기본값 변경  
+유닉스: export ES_HEAP_SIZE=500m; bin/elasticsearch  
+윈도우: SET ES_HEAP_SIZE=500m & bin/elasticsearch.bat  
+영구적으로 변경  
+유닉스: bin/elasticsearch.in.sh 파일에서 #!/bin/sh 이후에 ES_HEAP_SIZE 추가  
+윈도우: bin/elasticsearch.bat 파일에서 #!/bin/sh 이후에 ES_HEAP_SIZE 추가  
+
+배열 필드  
+단일 필드를 다중 필드 설정으로 데이터 재색인 없이 업그레이드 할 수 있다  
+다중 필드를 단일로 변경할 수 없다  
+한 번 지정하면 매핑에서 서브 필드를 삭제할 수 없다  
+
+동시성 제어 방법  
+- 낙관적 잠금(Optimistic locking) : 병렬 작업 허용, 드물게 나타나는 충돌 추정  
+- 비관적 잠금(Pessimistic locking) : 충돌을 야기하는 작업을 막으면서 방지  
+
+retry_on_conflict 파라미터  
+어플리케이션 도움 없이 자동으로 일래스틱서치가 재시도  
+
+
+범위 검색을 사용할때 바이너리 매치("이 도큐먼트는 범위 내에 있다 또는 이 도큐먼트는 범위 내에 없다")를 가지는 범위 쿼리로 들어간 도큐먼트는  
+범위 쿼리가 되는데 필요하지 않기 때문에 쿼리로 만들지 필터로 만들지 확실치 않다면 필터로 만들자.  
+
