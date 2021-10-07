@@ -2803,3 +2803,84 @@ retry_on_conflict 파라미터
 범위 검색을 사용할때 바이너리 매치("이 도큐먼트는 범위 내에 있다 또는 이 도큐먼트는 범위 내에 없다")를 가지는 범위 쿼리로 들어간 도큐먼트는  
 범위 쿼리가 되는데 필요하지 않기 때문에 쿼리로 만들지 필터로 만들지 확실치 않다면 필터로 만들자.  
 
+_termvector 종단점  
+색인된 텀에 대한 정보, 도큐먼트와 색인에 얼마나 있는지, 도큐먼트 내 어디에 있는지 확인  
+
+소문자화, 스태밍(stemming), 언어 특화(language-specific), 동의어  
+
+내장 분석기  
+- 표준 분석기, 단순 분석기, 화이트스페이스, 불용어, 키워드, 패턴, 언어 및 다국어, 스노우볼  
+
+토큰화  
+- 표준 토크나이저, 키워드, 문자, 소문자화, 화이트스페이스, 패턴, UAX URL EMAIL, 경로 계층  
+
+토큰 필터  
+- 표준, 소문자화, 길이, 불용어, TRUNCATE, TRIM, LIMIT TOKEN COUNT, 반전, 유일성, ASCII FOLDING, 동의어  
+
+Ngram  
+토큰의 각 단어 부분을 다중 서브 토큰으로 분해하는 방식  
+1-gram, Bigram, Trigram, min_gram, max_gram  
+
+edge ngram  
+ngram 분해의 변종, 앞부분 부터 만든다  
+
+shingle  
+문자 수준이 아닌 토큰 수준에서 ngram  
+
+스태밍(Stemming)  
+단어를 단어의 원형이나 어근으로 줄인다  
+
+스태밍 알고리즘  
+snowball 필터, porter_stem 필터, kstem 필터  
+
+스태밍 사전  
+Hunspell 분석기, 사전 파일은 elasticsearch.yml 파일이 있는 같은 디렉터리에 hunspell 이라는 디렉터리에 있어야 한다  
+hunspell 디렉터리 내부에 개별 언어 사전은 locale 명으로 폴더를 만들어 넣어야 한다  
+
+
+필드 데이터 캐시  
+elasticsearch가 색인 문서들에서 필드의 값을 저장하는 인 메모리 캐시이고 정렬, 스크립팅 혹은 필드들 안의 값들을 집계할 때 사용  
+데이터를 압축하는 방식으로 적재  
+필드 정렬이나 집합에 수행시 fielddata 매핑에 loading을 eager로 설정  
+
+필드 데이터 관리  
+- 메모리 제한: indices.fielddata.cache.size, indices.fielddata.cache.expire 설정
+- 서킷 브레이커 circuit breaker에 필드 데이터 사용
+- doc values로 메모리값 무시: 색인 데이터와 함께 디스크에 저장하고 그 값을 사용, 매핑 속성에 "doc_values:true" 설정
+
+TF-IDF(TF=term frequency / 단어빈도, IDF=inverse document frequency /역 문서 빈도)  
+하나의 문서에서 단어가 자주 반복된다면 관련성은 높아진다, 전체 문서에서 단어가 자주 반복된다면 관련성은 낮아진다  
+
+기본 점수 계산 함수  
+조합 인자 coordination factor: 얼마나 많은 문서에서 찾았는지, 얼마나 많은 단어를 찾았는지  
+질의 표준화 query normalization: 질의 결과 비교  
+
+TF-DIF 외 점수방법  
+- Okapi BM25
+--- 사전의 각 용어에 일치하는 값의 배열에 각 문서를 대응하고, 문서의 순위 결정. k1, b, discount_overlaps 설정이 있음
+--- k1은 숫자형으로 단어 빈도가 점수에 얼마나 중요한지, 기본값은 1.2
+--- b는 0-1 사이의 숫자형으로 문서의 길이가 점수에 미치는 영향도, 기본값은 0.75
+--- discount_overlaps는 여러 토큰이 같은 장소에서 발생할 경우 필드에 영향을 미칠지와 어떻게 길이를 정규화 할지 여부, 기본값은 true
+- Divergence from randomness 혹은 DFR similatity
+- Information based 혹은 IB similarity
+- LM Dirichlet similarity
+- LM Jelinek Mercer similarity
+
+부스팅(boosting)  
+문서의 관련성을 수정하는 절차. 문서를 색인할때 부스팅, 문서를 질의할때 부스팅이 있다  
+부스팅하는 값은 절대값이 아닌 상대값이다.  
+
+explain API  
+점수 설명하기, "explain=true" 설정을 url이나 전송 내용에 지정  
+
+질의 리스코어링(rescoring)  
+초기 질의가 실행되고 응답받은 결과를 가지고 점수를 계산하는 것  
+
+function_score 질의  
+임의의 함수에 숫자로 점수를 지정하여 초기 질의에 맞는 문서의 점수를 결정하는데 세부적으로 조절할 수 있다  
+- 가중치: 점수에 일정한 수를 곱한다
+- 점수 결합: score_mode(개별 함수를 어떤 방법으로 결합할지), boost_mode(원본 질의 점수와 function 점수를 어떻게 결합할지)
+- field_value_factor: 숫자 필드를 포함하는 필드의 이름을 받고 추가로 점수에 곱할 상수값을 받아 적용
+- 스크립트: Groovy 언어로 쓰여 있고 _score 를 사용하여 문서의 원래 접수에 접근 가능
+- random: 무작위 점수를 문서에 할당
+- decay 함수: 특정 필드를 기준으로 점수를 점진적으로 줄여준다
