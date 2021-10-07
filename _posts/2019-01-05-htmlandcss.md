@@ -296,4 +296,144 @@ MessagePort 객체 속성
 MessageChannel 객체의 MessagePort를 서로 다른 도메인에서 사용하려면 하나의 포트를 다른 쪽의 window 객체에 통지해야 한다.  
 
 
+서버 전송 이벤트(Server-Send Event)  
+서버 프로그램이 지정한 일정한 주기 마다 서버의 처리 결과를 웹 브라우저에 통지  
+```
+var source = new EventSource("서버소스")
+source.addEventListener("message", function(event){ ... }, false);
+```
+EventSource 객체의 속성과 메서드  
+- URL: EventSource 생성자 메서드에서 지정된 URL 값
+- readyState: 상태 값, CONNECTING(서버에 접속 요청을 수행 중인 단계), OPEN(서버에 접속 요청이 완료된 단계), CLOSED(서버와의 접속 상태가 종료된 단계)
+- onopen: 서버와의 접속이 완료되었을 경우 호출되는 이벤트 핸들러
+- onmessage: 서버로부터 메시지가 수신되었을 경우 발생되는 이벤트 핸들러
+- onerror: 오류가 발생되었을 경우 호출되는 이벤트 핸들러
+- close: 서버와의 접속을 해제하기 위한 메서드
 
+
+서버 푸시(Server Push)  
+서버로부터의 메시지가 클라이언트의 요청에 의해서가 아니라 서버의 판단에 의해 능동적으로 클라이언트에게 데이터를 전달하는 방식  
+
+
+폴링(Polling)  
+클라이언트가 주기적으로 서버에게 데이터를 요청하는 구조  
+
+
+웹 워커(Web Worker)  
+자바스크립트를 이용하여 백그라운드로 처리되는 일종의 스레드  
+```
+var worker - new Worker("worker_prime.js");
+worker.onmessage = function(evt) { ... }
+```
+- postMessage: 메시지를 워커에게 전송한다
+- terminate: 워커를 강제로 종료한다
+- onmessage: 워커가 보낸 메시지를 수신하는 이벤트 핸들러
+- onerror: 에러 발생을 통지받기 위한 이벤트 핸들러
+- close: 워커의 메시지 수신을 중지하는 메서드
+- importScript: 지정한 주소의 자바스크립트 파일을 읽어 실행하는 메서드
+- self: 워커 자신을 나타내는 변수
+- location: 워커 생성 시 갖는 location에 관한 정보
+- navigator: 워커 생성 시 갖는 location에 관한 정보
+- setTimeout, setInterval, clearInterval: 타이머 관련 작업을 수행할 수 있는 메서드
+- openDatabase, openDatabaseSync, indexedDB: 웹 데이터베이스를 처리하기 위한 객체
+- XMLHttpRequest: Ajax를 처리하기 위한 객체
+- Worker, SharedWorker: 워커 사용을 위한 객체
+- WebSocket: 웹 소켓을 위한 객체
+- applicationCache: 공용 워커의 소스 파일 이름이 menifest 파일에 수록되어 오프라인으로 처리될 경우의 applicationCache 객체이다.
+
+
+전용 워커(dedicated worker)  
+워커가 페이지별로 생성된다.  
+
+공용 워커(shared worker)  
+여러 창에대해 공용 워커의 이름만 같을 경우 하나만 생성되는 워커  
+메시지 교환을 위해 MessagePort 객체가 같이 사용된다.  
+공용으로 사용할 데이터를 한곳에 모아 처리하고 그 결과를 함께 공유할 경우 유용  
+
+
+웹 소켓  
+웹 브라우저와 서버 간의 완전한 전이중(full-duplex) 통신을 지원  
+- url: 웹 소켓 프로토콜을 사용해 연결할 서버의 url 주소
+- readyState: 상태 값, 0(CONNECTING-연결 안된 상태), 1(OPEN-연결된 상태), 2(CLOSING-연결 해제 절차를 수행중인 상태), 3(CLOED-연결 해제 상태)
+- bufferedAmount: send 메서드이 의해 전송 버퍼에 놓여 전송 대기 준인 데이터 바이트 수
+- protocol: 서버의 요청에 의해 실행되는서브 프로토콜의 이름
+- send: 데이터를 서버에 전송하기 위한 메서드
+- close: 연결 상태를 해제하기 위한 메서드
+- onopen: 서버와의 웹 소켓 연결을 알리는 이벤트 핸들러
+- onmessage: 서버로부터 전달된 데이터의 수신을 알리는 이벤트 핸들러
+- onerror: 에러 발생 시 실행되는 이벤트 핸들러
+- onclose: 연결 해제 시 실행되는 이벤트 핸들러
+
+
+위치정보(Geolocation) API  
+자바스크립트의 window.navigator 객체에 정의된 디바이스 위치 정보  
+GPS 정보 기반 혹은 네트쿼크 주소 정보를 기반으로 제공  
+
+
+사용자 위치 정보의 출력(FF, CR, OP)  
+getCurrentPosition(success_callback, error_callback, options)  
+
+success_callback  
+- coords.latitude: 위도
+- coords.longitude: 경도
+- coords.altitude: 고도 값
+- coords.accuracy: 위도 경도의 오차 (미터 단위)
+- coords.altitudeAccuracy: 고도의 오차 (미터 단위)
+- coords.heading: 디바이스의 진행 방향으로 북쪽을 기준으로 시계 방향의 각도
+- coords.speed: 디바이스의 진행 속도 (초당 미터 단위)
+- timeout: 위치 정보를 얻은 시각으로 DOM 타입 스탬프 값
+
+error_callback  
+- code: 0(UNKNOWN_ERROR-알 수 없는 에러), 1(PERMISSION_DENIED-권한 없음), 2(OPSITION=UNVALILABLE-위치 정보를 얻을 수 없음), 3(TIMEOUT-시간 초과)
+- message: 에러 메세지
+
+options  
+- enableHighAccuracy: boolean 값으로 정확도가 높은 위치 정보를 요청하는 경우, 기본값 false
+- timeout: 위치 정보를 구하기 위해 허용된 밀리세컨드 단위의 시간 제한 값
+- maximumAge: 위치 정보의 유효 기간을 밀리세컨드 단위로 설정한 것
+
+
+사용자 위치 추적(FF, CR, OP)
+watchPosition(success_callback, error_callback, options)  
+현재 위치 정보 보고, getCurrentPosition과 차이점은 디바이스가 현재의 위치 정보가 변경되었다고 판단할 때마다 success_callback 호출  
+
+clearPosition(watchPositionId)  
+watchPosition에 의해 활성화 된 위치 정보의 보고 정지  
+
+
+파일 처리(FF, CR)  
+사용자에 의해 드래그앤 드롭된 파일이나 input 태그를 통해 지정된 파일에만 접근 가능  
+
+File 객체  
+- name: 파일의 이름을 알려주는 속성
+- size: 파일 크기
+- type: 파일 MIME 타입
+- slice(start.length): 시작 위치와 바이트 단위의 길이를 지정하면 그 영역에 해당하는 파일의 내용을 잘라 새로운 Blob 객체를 생성
+
+FileReader 객체  
+- readAsText(filename, encoding): 텍스트 파일을 주어진 인코딩 방식으로 읽는다
+- readAsBinaryString(filename): 이진 파일로 파일을 읽는다
+- readAsDataURL(filename): 파일 내용을 DataURL 형식으로 읽는다
+- result: 읽어들인 파일의 내용
+- error: 에러가 발생한 경우 에러 값
+- onload: 읽기가 성공적으로 완료되었을 경우 호출되는 이벤트 핸들러
+- onprogress: 읽기의 진행 상황을 보고하기 위해 호출되는 이벤트 핸들러
+- onerror: 읽기 에러가 발생했을 경우 호출되는 이벤트 핸들러
+
+
+XMLHttpRequest Level2를 이용한 크로스 도메인 요청(CR)  
+기존의 AJAX(Asynchronous JavaScript & XML)에서 사용하는 XMLHttpRequest 객체는 같은 도메인 내에서만 문서를 요청하고 결과 수신 가능,  
+XMLHttpRequest Level2는 다른 도메인에 대해 요청하고 응답할 수 있음  
+FormData 객체를 사용하여 단순한 형태로 전달 가능  
+
+
+통지(Notification)(CR)  
+자바스크립트 window객체의 webkitNotifications 객체를 통해 메시지 알림 표시  
+- requestPermission: 통지 기능의 사용자 동의를 구하는 절차 수행
+- checkPermission: 사용자 동의가 이루어졌는지 반환
+- createNotification: 일반 텍스트 형식으로 오른쪽 하단에 통지 메시지가 나타남
+- createHTMLNotification: 인자로 URL을 제공하여 오른쪽 하단에 HTML 문서가 나타남
+
+
+WebGL  
+웹 기반의 그래픽 라이브러리, 자바스크립트를 이용해 3D 그래픽을 웹 브라우저에서 처리할 수 있도록 하는 기술  
