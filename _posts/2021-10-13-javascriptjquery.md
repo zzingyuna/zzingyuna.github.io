@@ -1,0 +1,232 @@
+---
+layout: post
+---
+
+# Javascript And JQuery
+자바스크립트 공식 명칭은 ECMAScript.  
+
+function(){} 형태는 함수이지만 이름이 없으므로 익명함수라고 부른다.  
+
+클로저  
+지역 변수를 남겨두는 현상 혹은 내부의 변수들이 살아있는 것이므로 함수로 생성된 공간을 부르는 명칭  
+
+타이머 함수  
+setTimeout(): 특정한 시간 후에 함수를 한 번 실행  
+setInterval(): 특정한 시간마다 함수를 실행  
+
+인코딩과 디코딩 함수  
+- escape(): 적절한 정도로 인코딩, 영문자 숫자 특수문자를 제외하고 모두 인코딩
+- unescape(): 적절한 정도로 디코딩
+- encodeURI(uri): 최소한의 문자만 인코딩, 인터넷 주소에서 사용되는 일부 특수문자는 변환하지 않는다
+- decodeURI(encodedURI): 최소한의 문자만 디코딩
+- encodeURIComponent(urlComponent): 대부분의 문자를 모두 인코딩
+- decodeURIComponent(encodedURI): 대부분의 문자를 모두 디코딩
+
+#### _
+- eval(): 문자열을 자바스크립트 코드로 실행하는 함수
+- isFinite(): number가 무한한 값인지 확인
+- isNaN(): number가 NaN인지 확인
+- parseInt(string, [진수]): string을 정수로 바꿔준다
+- parseFloat(string, [진수]): string을 유리수로 바꿔준다
+- Number(obj): 숫자로 바꿔준다, 숫자로 바꿀 수 없으면 NaN으로 변환한다
+
+in 키워드  
+'속성명' in 객체명  
+해당 속성명이 객체 내에 포함되어있는지 확인  
+
+with(객체) {...}  
+괄호 안에서 객체를 명시할 필요없이 속성명만 사용하여 간략화 가능  
+
+delete(객체.속성)  
+속성 제거  
+
+생성자 함수  
+new 키워드로 객체를 생성할 수 있는 함수  
+
+instanceof 키워드  
+객체 instanceof 객체  -> true 결과인 경우 상속되었다고 판단  
+
+constructor() 메서드  
+typeof 연산자로 타입 비교가 어려울 때 두 대상을 같은 자료형으로 취급하고 싶을 때 사용  
+
+Number 객체 메서드  
+- toExponential(): 숫자를 지수 표시로 나타낸 문자열 리턴
+- toFixed(): 숫자를 고정 소수점 표시로 나타낸 문자열 리턴, 소수점 몇 번째 자리까지 자르는 메서드
+- toPrecision(): 숫자를 길이에 따라 지수 또는 고정 소수점 표시로 나타낸 문자열 리턴, 유효 숫자의 자릿수
+
+Number 생성자 함수의 속성  
+- MAX_VALUE: 자바스크립트 숫자가 나타낼 수 있는 최대의 숫자
+- MIN_VALUE: 자바스크립트 숫자가 나타낼 수 있는 최소의 숫자
+- NaN: 자바스크립트의 숫자로 나타낼 수 없는 숫자
+- POSITIVE_INFINITY: 양의 무한대 숫자
+- NEGATIVE_INFINITY: 음의 무한대 숫자
+
+String 객체의 HTML 관련 메서드  
+- anchor(): a 태그로 문자열을 감싸 리턴
+- big(): big 태그로 문자열을 감싸 리턴
+- blink(): blink 태그로 문자열을 감싸 리턴
+- bold(): b 태그로 문자열을 감싸 리턴
+- fixed(): tt 태그로 문자열을 감싸 리턴
+- fontcolor('색상'): font 태그로 문자열을 감싸고 color 속성을 주어 리턴
+- fontsize(숫자): font 태그로 문자열을 감싸고 size 속성을 주어 리턴
+- italice(): i 태그로 문자열을 감싸 리턴
+- link(): a 태그에 href 속성을 지정해 리턴
+- small(): small 태그로 문자열을 감싸 리턴
+- strike(): strike 태그로 문자열을 감싸 리턴
+- sub(): sub 태그로 문자열을 감싸 리턴
+- sup(): sup 태그로 문자열을 감싸 리턴
+
+연산 메서드  
+- reduce(): 배열의 요소가 하나가 될 때까지 요소를 왼쪽부터 두개씩 묶는 함수 실행
+- reduceRight(): 배열의 요소가 하나가 될 때까지 요소를 오른쪽부터 두개씩 묶는 함수 실행
+
+ECMAScript 5 Object 객체  
+- Object.defineProperty(): 객체에 속성 추가
+- Object.defineProperties(): 객체에 속성들을 추가
+- Object.create([상속할 객체], {...}): 객체 생성
+- Object.preventExtensions(): 객체의 속성 추가 제한
+- Object.isExtensible(): 객체에 속성 추가가 가능한지 확인
+
+location 객체  
+- assign(link): 현재 위치 이동
+- reload(): 새로고침
+- replace(link): 현재 위치를 이동, 뒤로가기 불가
+
+
+태양, 지구, 달  
+```
+<html>
+    <head>
+    </head>
+    <body>
+        <script>
+            window.onload = function() {
+                var sun =  document.getElementById("sun");
+                var earth =  document.getElementById("earth");
+                var moon =  document.getElementById("moon");
+
+                sun.style.position = 'absolute';
+                earth.style.position = 'absolute';
+                moon.style.position = 'absolute';
+                sun.style.left = '250px';
+                sun.style.top = '200px';
+                
+                var earthAngle = 0;
+                var moonAngle = 0;
+
+                setInterval(function() {
+                    var earthLeft = 250 + 150 * Math.cos(earthAngle);
+                    var earthTop = 200 + 150 * Math.sin(earthAngle);
+                    var moonLeft = earthLeft + 50 * Math.cos(moonAngle);
+                    var moonTop = earthTop + 50 * Math.sin(moonAngle);
+
+                    earth.style.left = earthLeft + 'px';
+                    earth.style.top = earthTop + 'px';
+                    moon.style.left = moonLeft + 'px';
+                    moon.style.top = moonTop + 'px';
+
+                    earthAngle += 0.1;
+                    moonAngle += 0.3;
+
+                }, 1000/30);
+            }
+        </script>
+        <h1 id="sun">@</h1>
+        <h1 id="earth">0</h1>
+        <h1 id="moon">*</h1>
+    </body>
+</html>
+```
+
+알파벳 랜덤 무브
+```
+<html>
+    <head>
+        <script>
+            function nextRandomInteger(limit) {
+                return Math.round(Math.random() * limit);
+            }
+
+            var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            function randomAlphabet() {
+                return alphabet.charAt(nextRandomInteger(25));
+            }
+
+            function randomSpeed(maxSpeed) {
+                return Math.random() * maxSpeed - Math.random() * maxSpeed;
+            }
+
+            var canvasWidth = 700;
+            var canvasHeight = 400;
+
+            function MovingText() {
+                this.x = nextRandomInteger(canvasWidth);
+                this.y = nextRandomInteger(canvasHeight);
+                this.vx = randomSpeed(10);
+                this.vy = randomSpeed(10);
+
+                this.body = document.createElement('h1');
+                this.body.innerHTML = randomAlphabet();
+                this.body.style.position = 'absolute';
+
+                document.body.appendChild(this.body);
+            }
+
+            MovingText.prototype.move = function() {
+                if (this.x < 0 || this.x > canvasWidth) { this.vx *= -1; }
+                if (this.y < 0 || this.y > canvasHeight) { this.vy *= -1; }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                this.body.style.left = this.x + 'px';
+                this.body.style.top = this.y + 'px';
+            }
+
+            window.onload = function() {
+                var movingTexts = [];
+
+                for (let index = 0; index < 100; index++) {
+                    movingTexts.push(new MovingText());
+                }
+
+                setInterval(function() {
+                    for (let i = 0; i < movingTexts.length; i++) {
+                        movingTexts[i].move();
+                    }
+                }, 1000 / 60);
+            }
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
+```
+
+이벤트 버블링  
+IE: cancelBubble 속성을 true로 변경  
+그 외: stopPropagation() 메서드 사용  
+
+IE 이벤트 연결 및 제거  
+attachEvent(eventProperty, eventListener); 이벤트가 추가되는 형식  
+detachEvent(eventProperty, eventListener); 함수명을 모르면 제거 불가  
+
+JQuery 속성 선택자  
+- 요소[속성=값] 속성과 값이 같은 객체 선택
+- 요소[속성|=값] 속성 안의 값이 특정 값과 같은 객체 선택
+- 요소[속성~=값] 속성 안의 값이 특정 값을 단어로 시작하는 객체 선택
+- 요소[속성^=값] 속성 안의 값이 특정 값으로 시작하는 객체 선택
+- 요소[속성$=값] 속성 안의 값이 특정 값으로 끝나는 객체 선택
+- 요소[속성*=값] 속성 안의 값이 특정 값을 포함하는 객체 선택
+- 요소:odd 홀수 번째 위치한 객체 선택
+- 요소:even 짝수 번째 위치한 객체 선택
+- 요소:first 첫 번째 위치한 객체 선택
+- 요소:last 마지막에 위치한 객체 선택
+- 요소:contains(문자열) 특정 문자열을 포함하는 객체 선택
+- 요소:eq(n) n번째 위치하는 객체 선택
+- 요소:gtn(n) n번째 초과에 위치하는 객체 선택
+- 요소:has(h1) h1태그가 있는 객체 선택
+- 요소:lt(n) n번째 미만에 위치하는 객체 선택
+- 요소:not(선택자) 선택자와 일치하지 않는 객체 선택
+- 요소:nth-child(3n+1) 3n+1번째에 위치하는 객체 선택 (예: 1,4,7..)
+
