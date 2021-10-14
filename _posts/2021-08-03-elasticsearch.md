@@ -2884,3 +2884,338 @@ function_score 질의
 - 스크립트: Groovy 언어로 쓰여 있고 _score 를 사용하여 문서의 원래 접수에 접근 가능
 - random: 무작위 점수를 문서에 할당
 - decay 함수: 특정 필드를 기준으로 점수를 점진적으로 줄여준다
+
+지표 집계 타입  
+- stats: 통계 수집, 얼마나 많은 데이터가 있는지 최소, 최대 평균 값 등을 구함
+- individual stats(min, max, sum, avg, value_count)
+- extended_stats: 성격 검사 결과 포함, 분산과 표준편차를 이용하여 유사한 성격을 그룹지어 통계 수집
+- percentiles: 백분위 집계
+- percentile_ranks
+- cardinality: 유일한 사용자 수를 찾을 때
+
+다중 버킷 집계  
+- 텀즈 집계 Terms aggergations
+- 범위 집계
+- 히스토그램 Histogram
+- 중첩 역 중첩
+- 지오 거리, 지오 해시 그리드
+
+top_hits 집계  
+하위 집계의 결과를 묶어서 보여줌  
+
+significant_terms 집계  
+전체 색인보다 질의 결과에 의해 자주 나타나는 단어 반환  
+
+도큐먼트 간 관계 정의 옵션  
+- 개체 타입
+- 중첩 도큐먼트
+- 도큐먼트 간 부모 자식 관계
+- 비정규화
+- 애플리케이션측 조인
+
+
+Nested 타입 옵션  
+- include_in_parent:true
+-- 인접한 부모 도큐먼트에 하나의 중첩 도큐먼트 필드를 색인해 넣는 옵션
+- include_in_root:true
+-- 중첩 매핑에 추가하면 내부 개체를 두 번 색인한다 (중첩 도큐먼트에서 한번, 루트 도큐먼트에서 한번)
+- score_mode:avg
+-- 일치하는 중첩 도큐먼트 개수의 평균 점수
+- score_mode:total
+-- 중첩 도큐먼트 점수를 요약
+- score_mode:max
+-- 중첩 도큐먼트 점수의 최댓값
+- score_mode:none
+-- 어떠한 점수도 총점에 대해 산출하지 않는다
+- inner_hits: { from: 0, size:1 }
+-- 중첩 도큐먼트 중 어느 것이 명시한 중첩 쿼리로 일치했는지 확인
+
+
+멀티캐스트 디스커버리  
+클러스터에 추가되는 노드들의 ip가 자주 바뀌는 경우처럼 같은 네트워크 내에 위치하고 있는 매우 유동적인 클러스터를 사용하는 경우 유용  
+
+유니캐스트 디스커버리  
+접속할 대상이 되는 일래스틱서치 호스트 목록을 사용, 노드의 ip주소가 자주 변경되지 않거나 네트워크 전체가 아닌 특정 노드들끼리만 서로 통신하여야 하는 경우 유용  
+
+마스터 노드  
+클러스터의 상태(현재 설정값, 샤드, 색인, 노드들의 상태)를 관리하는 역할  
+
+
+노드 해제  
+노드를 먼저 해체하여 해당 노드에 있는 모든 샤드를 클러스터의 다른 노드로 옮긴다  
+```
+curl -XPUT localhost:9200/_cluster/settings -d '{
+    "transient": {
+	    "cluster.routing.allocation.exclude._ip": "ip주소.."
+	}
+}'
+```
+
+롤링 리스타트  
+노드를 업그레이드하거나 정적인 설정값을 바꾼 경우 데이터의 가용성을 해치지 않으며 클러스터를 재구동하기 위한 방법  
+1. 클러스터의 allocation 비활성화
+2. 업그레이드할 노드를 정지
+3. 노드 업그레이드
+4. 업그레이드된 노드 구동
+5. 업그레이드된 노드가 클러스터에 추가되기를 기다림
+6. 클러스터의 allocation 활성화
+7. 클러스터가 그린 상태가 되기를 기다림
+
+샤드 재분배 중지 설정
+```
+curl -XPUT 'localhost:9200/_cluster/settings' -d '{
+    "transient": {
+	    "cluster.routing.allocation.enable": "none"
+	}
+}'
+```
+
+샤드 재분배 활성화 설정
+```
+curl -XPUT 'localhost:9200/_cluster/settings' -d '{
+    "transient": {
+	    "cluster.routing.allocation.enable": "all"
+	}
+}'
+```
+
+주와 레플리카 존재하는 세그먼트 파일을 동일한 것으로 만들기 위한 방법  
+1. 주와 레플리카 샤드 몯에서 하나의 큰 세그먼트 파일을 만들어내기 위한 optimize API 사용
+2. 레플리카 수를 0으로 변경했다가 다시 큰 수로 변경
+
+스케일 아웃  
+- 클러스터에 노드 추가
+- 노드 업그레이드
+
+스케일링 전략  
+- 오버 샤딩: 미리 감안하여 색인에 대해 의도적으로 다수의 샤드 생성
+- 데이터를 색인과 샤드에 분할하기
+- 처리량 극대화 하기(예: 색인이 진행되는 동안 레플리카 수를 줄이고 색인 작업이 종료되면 레플리카 수를 늘린다)
+
+엘리어스  
+하나 이상의 실제 색인을 지칭하기 위해 사용할 수 있는 포인터 혹은 이름.  
+클러스터 상태 정보 내에 존재하며 마스터 노드에 의해서 관리된다.  
+클러스터 상태 맵 자료구조에 존재하는 색인에 매핑시키기 위한 추가적인 키가 오버헤드 된다.  
+재색인 관점에서 유연성 제공  
+
+멀티서치  
+"_msearch" 종단점 사용  
+
+멀티겟  
+다수의 문서 조회, "mget" 종단점 사용  
+
+리프레시 주기 설정  
+```
+curl -XPUT localhost:9200/인덱스명/settings -d '{
+  "index.refresh_interval": "5s"    // -1로 설정시 리프레시 비활성화
+}'
+```
+
+플러시  
+메모리 내 세그먼트를 디스크로 커밋, 트랜잭션 로그 삭제  
+- 메모리 버퍼가 가득 찼을때 실행된다
+- 마지막 플러시로부터 일정시간 지났을때 실행된다
+- 트랜잭션 로그의 사이즈가 일정한 임계치를 넘었을때 실행된다
+
+세그먼트 머지  
+세그먼트 총 숫자 적절히 유지, 삭제된 문서 제거로 검색 성능 향상  
+- index.merge.policy.segments_per_tier 하나의 계층에 가지고 있을 세그먼트 수
+- index.merge.policy.max_merge_at_once 한번에 합쳐질 수 있는 세그먼트 수
+- index.merge.policy.max_merged_segment 세그먼트 크기의 최대값
+- index.merge.scheduler.max_thread_count 머지 작업에 사용될 수 있는 스레드 최대 개수
+
+강제 머지 요청 -> 최적화  
+갱신이 일어나지 않는 색인에서 효과적  
+```
+curl localhost:9200/인덱스명/_optimize?max_num_segments=1
+# max_num_segments: 샤드별로 몇 개의 세그먼트로 병합되기를 원하는지
+```
+
+저장 제한 Store Throttling  
+indices.store.throttle.max_bytes_per_sec 머지 작업이 사용할 수 있는 I/O 처리량 제한  
+
+indices.store.throttle.type:none  
+저장 제한 임계값 없애기  
+
+저장 설정  
+- MMapDirectory: 필요 파일을 가상 메모리에 매핑, 메모리에 파일 직접 접근, 파일 시스템 캐시 사용. 사용되지 않는 메모리를 디스크로 내리는 시스템 가상메모리 스왑과 유사, 크기가 크고 무작위로 접근되는 파일일때 유리 (index.store.type:mmapfs)
+- NIOFSDirectory: 읽을 데이터를 JVM 힙 버퍼에 복제, 크기가 작고 연속적으로 접근되는 파일일때 유리 (index.store.type:niofs)
+
+필터캐시  
+필터의 결과 캐시
+- indices.cache.filter.size: 캐시 크기 설정
+- indices.cashe.filter.expire: 캐시 만료 시간 설정
+
+캐시 불가 예  
+- 범위 필터에서 now 적용시
+- has_child, has_parent 필터는 _cache 플래스 사용불가
+
+캐시 축출  
+캐시가 가득차서 공간 확보를 위해 LRU 정책에 의거 사용된지 오래된 캐시 항목 제거시 발생  
+
+비트셋  
+크기가 작고 쉽게 만들 수 있다, 캐시를 생성하는 오버헤드가 매우 적다, 각 필터별로 저장된다, 다른 비트셋과 결합하여 사용 가능하다  
+- 비트셋 사용 필터: term, terms, exists/missing, prefix
+- 비트셋 미사용 필터: regexp, nested/has_child/has_parent, script, geofilters
+- bool 필터에서 비트셋을 사용하는 필터들을, in/or/not 필터에서 비트셋을 사용하지 않는 필터들을 결합하여 사용하면 좋다
+
+doc value  
+색인 타입에 연산되어 색인과 함께 디스크 저장  
+
+
+샤드 쿼리 캐시  
+샤드가 잘 변하지 않고 많은 같은 요청을 반복적으로 수행하는 경우, 정적인 데이터에 대한 검색 요청 전체를 재사용하는 경우 캐시  
+- index.cache.query.enable:true 색인 레벨에서 샤드 쿼리 캐시 활성화
+- query_cache 파라미터: 쿼리에 대해 색인 레벨 설정
+- indices.cache.query.size: 샤드 쿼리 캐시 크기 설정
+
+cache.recycler.page.limit.heap 페이지 리사이클러  
+집계에서 사용하는 큰 배열은 재사용할 수 있도록 여기에 배치됩니다. 기본값은 힙의 10%입니다.  
+
+워머  
+캐시 준비, 레프레시 작업 수행시마다 elasticsearch가 쿼리를 수행하도록 도와준다, 처음 실행될때 너무 느린데 색인이 느려지는 것은 크게 문제 없고 검색 속도가 빨라야 한다면 색인 워머 사용 추천.  
+- 워머목록 확인: curl localhost:9200/인덱스명/_warmer?
+- 워머 추가, 삭제 가능, 워머가 많으면 리프레시 느림
+
+* 분석 필드.  
+index_options:positions 기본값, 위치 저장  
+index_options:freqs 위치 색인 비활성화  
+index_options:docs 빈도 색인 X
+
+search_type  
+- query_then_fetch: 전체 샤드의 검색이 모두 수행된 후 결과 출력, 전체 취합된 결과를 size 매개변수에서 지정한 수만큼 출력
+- query_and_fetch: 샤드별로 검색되는대로 결과 출력, size * 샤드 갯수만큼 출력
+- dfs_query_then_fetch: query_then_fetch와 같으나 정확한 스코어링을 위해 검색어들을 사전 처리
+- dfs_query_and_fetch: query_and_fetch와 같으나 정확한 스코어링을 위해 검색어들을 사전 처리
+
+* 색인의 크기가 커져도 괜찮다면 퍼지/와일드카드/구문 쿼리 대신 엔그램과 싱글을 사용하면 검색이 빨라짐
+* 스크립트 사용 보다 색인 시 새로운 필드를 추가하여 검색 속도 향상
+* 스크립트가 자주 변경되지 않으면 elasticsearch 플러그인 형태로 네이티브 스크립트 작성
+* 샤드별로 문서 빈도가 불균형하면 dfs_query_then_fetch 사용
+* 많은 문서를 탐색해야 한다면 스캔 검색 사용
+
+색인 템플릿  
+데이터 저장 형태가 반복되서 나타나는 것이 확인된 경우 사용  
+- REST API, 설정 파일로 생성
+- 복수 템플릿 병합 가능
+- 설정시 order 속성이 적은 숫자면 먼저 적용, 높은 숫자면 오버라이딩 한다
+- 템플릿 조회. curl localhost:9200/_template
+
+템플릿 파일 시스템에서 설정하고 싶을때  
+- 템플릿 설정은 json 포맷이어야 한다
+- 다템플릿 정의는 elasticsearch 설정이 있는 위치의 templates 디렉토리에 있어야 한다(elasticsearch.yml path.conf 위치)
+- 템플릿 정의는 마스터로 선출될 가능성이 있는 노드의 디렉토리에 있어야 한다
+
+동적 매핑 비활성화  
+elasticsearch.yml  index.mapper.dynamic:false  
+
+할당 인식 Allocation Awareness  
+데이터의 복제본이 어디에 위치할지에 대한 인지 상태, 클러스터의 위상 topology 설계.  
+- 샤드 기반 할당: "cluster.routing.allocation.awareness.attributes:rack"로 설정, "node.rack:1" 메타데이터 키가 할당 인식 파라미터
+- 강제 할당 인식: "cluster.routing.allocation.awareness.attributes:zone", "cluster.routing.allocation.force.zone.values:us-east,us-west"로 설정
+
+클러스터 상태 확인  
+- curl localhost:9200/_cluster/health
+- relocting_shards: 샤드를 클러스터의 다른 노드로 이동시키는 수
+- initializing_shards: 색인을 새로 생성하거나 노드를 재시작 하는 수
+- unassigned_shards: 할당되지 않는 샤드 수
+- level 파라미터 추가 시 문제를 디테일하게 확인 가능
+
+느린작업 확인 로그  
+- 슬로우 로그
+-- 인덱스명/_settings
+-- index.search.slowlog.threshold.query.warn: 10s
+-- index.search.slowlog.threshold.query.info: 1s
+-- index.search.slowlog.threshold.query.debug: 2s
+-- index.search.slowlog.threshold.query.trace: 500ms
+- 슬로우 색인 로그
+-- 인덱스명/_settings
+-- index.search.slowlog.threshold.fetch.warn: 1s
+-- index.search.slowlog.threshold.fetch.info: 1s
+-- index.search.slowlog.threshold.fetch.debug: 500ms
+-- index.search.slowlog.threshold.fetch.trace: 200ms
+
+핫 스레드 HOT_THREADS API  
+특정 프로세스가 블락되어 문제를 일으키고 있는것을 확인가능  
+curl localhost:9200/_nodes/hot_threads  
+- type 파라미터: cpu,wait,block 중 하나 스냅샷의 대상이 되는 스레드 상태
+- interval 파라미터: 기본값 500ms, 첫 번째와 두번째 사이 대기 시간
+- threads 파라미터: 몇 개의 상위 핫스레드를 보여줄 것인가
+
+
+스레드 풀 종류  
+- bulk: 기본값은 가용 프로세서 수
+- index: 기본값은 가용 프로세서 수
+- search: 기본값은 가용 프로세서 수 * 3
+
+elasticsearch.yml 벌크 스레드 풀 설정  
+threadpool.bulk.type: fixed / cache
+threadpool.bulk.size: 40
+threadpool.bulk.queue_size: 200
+
+가비지 컬렉터  
+메모리 부족시 실행, 레퍼런스가 끊긴 객체들 삭제 JVM 어플리케이션이 사용할 수 있도록 메모리 확보  
+
+필터 캐시  
+쿼리 결과 메모리에 저장, "index.cache.filter.typed:node", "index.cache.filter.size: 20%"로 설정  
+- 색인 수준 (거의 사용 안함)
+- 노드 수준
+
+필드 캐시  
+필드 값 메모리에 저장, "indices.fielddata.cache.size: 20%"로 설정  
+- 노드별 현재 상태 조회: curl localhost:9200/_nodes/stats/indices/fielddata?fields=*&pretty=1
+- 색인별 현재 상태 조회: curl localhost:9200/_stats/fielddata?fields=*&pretty=1
+- 노드별 색인별 현재 상태 조회: curl localhost:9200/_nodes/stats/indices/fielddata?level=indices&fields=*&pretty=1
+
+서킷 브레이커  
+메모리 부족 에러 방지를 위해 인위적인 임계치  
+- indices.breaker.total.limit: 기본값은 힙의 70%
+- indices.breaker.fielddata.limit: 기본값은 힙의 60%
+- indices.breaker.request.limit: 기본값은 힙의 40%
+
+스왑 방지  
+- bootstrap.mlockall:true 설정
+- 설정확인 curl localhost:9200/_nodes/process
+
+
+개별 노드의 설정을 사용하여 특정 태그값을 가진 노드에만 위치할 색인을 생성하여 더 많은 힙 이외의 메모리를 가진 노드에 위치, 색인에 대한 응답시간 향상  
+"index.routing.allocation.include.tag: 태그명1,태그명2..."  
+
+I/O가 사용할 노드 수준 제한  
+indices.store.throttle.type: none(노드전체)/merge(머지할때제한)/all(모든 노드 모든 샤드에 대한 작업 제한 한계점 적용)  
+index.store.throttle.type: node(노드전체)/merge(머지할때제한)/all(모든 노드 모든 샤드에 대한 색인 작업 제한 한계점 적용)  
+노드 수준 설정의 경우 "indices.store.throttle.max_bytes_per_sec: 50mb" 사용(초당 메가바이트),  
+색인 수준 설정의 경우 index.store.throttle.max_bytes_per_sec 사용  
+
+데이터 백업  
+- 스냅샷 API: 클러스터 상태, 데이터 복사, 논블로킹 작업
+- 스냅샷 API를 이용해 공유 파일 시스템으로 백업
+```
+# 저장소 정의
+curl -XPUT localhost:9200/_snapshot/저장소이름 -d '{
+  "type": "fs",
+  "settings": {
+    "location": "저장소 네트워크상 위치",
+	"compress": true,
+	"max_snapshot_bytes_per_sec": "20mb",
+	"max_restore_bytes_per_sec": "20mb"
+  }
+}'
+
+#첫번째 스냅샷 실행
+curl -XPUT localhost:9200/_snapshot/저장소이름/first_snapshot
+#첫번째 스냅샷 실행(스냅샷이 종료된 후까지 기다린 후 요청 반환)
+curl -XPUT localhost:9200/_snapshot/저장소이름/first_snapshot?wait_for_completion=true
+#두번째 스냅샷 실행
+curl -XPUT localhost:9200/_snapshot/저장소이름/second_snapshot
+
+#복원하기
+curl -XPOST localhost:9200/_snapshot/저장소이름/first_snapshot/_restore
+#복원하기 (복원하기가 종료된 후까지 기다린 후 요청 반환)
+curl -XPOST localhost:9200/_snapshot/저장소이름/first_snapshot/_restore?wait_for_completion=true
+
+#삭제하기
+curl -XDELETE localhost:9200/_snapshot/저장소이름/first_snapshot
+```
+
+- 저장소 플러그인: 아마존 S3, 하둡 HDFS
