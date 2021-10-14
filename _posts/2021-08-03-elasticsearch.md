@@ -3219,3 +3219,310 @@ curl -XDELETE localhost:9200/_snapshot/저장소이름/first_snapshot
 ```
 
 - 저장소 플러그인: 아마존 S3, 하둡 HDFS
+
+거리 순 정렬
+```
+curl localhost:9200/인덱스명/_search -d '{
+  "query": {
+    "match": {
+	  "title": "elasticsearch"
+	}
+  },
+  "sort": [
+    {
+	  "_geo_distance": {
+	    "location.geolocation": "40,-105",
+		"order": "asc",
+		"unit": "km",
+		"mode": "avg" #min/max/avg 선택가능
+	  }
+	}
+  ]
+}'
+```
+
+점수 계산할 때 거리 고려하기 (거리가 멀어질수록 점수 낮춤)  
+```
+curl localhost:9200/인덱스명/_search? -d '{
+  "query": {
+    "function_score": {
+	  "query" :{
+	    "match": {
+		  "title": "elasticsearch"
+		}
+	  }
+	},
+	"linear": {
+	  "location.geolocation": {
+	    "origin": "40, -105",
+		"scale": "100km",
+		"decay": 0.5
+	  }
+	}
+  }
+}'
+```
+
+특정 위치로부터 범위 안에 있는 결과만 반환  
+```
+curl localhost:9200/인덱스명/_search -d '{
+  "query": {
+    "filtered": {
+	  "filter": {
+	    "geo_distance": {
+		  "distance": "50km",
+		  "location.geolocation": "40, -105"
+		}
+	  }
+	}
+  }
+}'
+
+# distance_type 파라미터 추가
+sloppy_arc: 두 점 사이의 거리를 원호의 빠른 근사치를 구해서 계산
+arc: 원의 호를 계산, sloppy_arc보다 정확
+plane: 가장 빠르지만 부정확한 구현
+
+# optimize_bbox 파라미터
+none
+memory
+indexed
+```
+
+거리범위 필터 (특정 위치에서 50~100km 사이 검색)  
+```
+curl localhost:9200/인덱스명/_search -d '{
+  "query": {
+    "filtered": {
+	  "filter": {
+	    "geo_distance_range": {
+		  "from": "50km",
+		  "to": "100km",
+		  "location.geolocation": "40, -105"
+		}
+	  }
+	}
+  }
+}'
+```
+
+거리범위 집계  
+```
+"aggs": {
+  "events_ranges": {
+    "geo_distance": {
+	  "field": "location.geolocation",
+	  "origin": "40, -105",
+	  "unit": "km",
+	  "ranges": [
+	    { "to": 100 },
+	    { "from": 100, "to": 5000 },
+	    { "from": 5000 }
+	  ]
+	}
+  }
+}
+```
+
+바운딩 박스 필터  
+```
+curl localhost:9200/인덱스명/_search -d '{
+  "query": {
+    "filtered": {
+	  "filter": {
+	    "geo_bouding_box": {   #바운딩박스(직사각형)/다각형/지오해시 모양 선택 가능
+		  "location.geolocation": {
+		    "top_left": "40, -103",
+			"buttom_right": "38,-103"
+		  }
+		}
+	  }
+	}
+  }
+}'
+
+위도와 경도를 별도로 색인하도록 하려면 아래와 같이 설정
+"geolocation": { "type": "geo_point", "lat_lon": true }
+```
+
+지오해시  
+지오 포인트에서 지오해시를 색인하도록 하려면 매핑에서 geohash:true 로 설정,  
+그 해시의 부모도 색인하려면 geohash_prefix:true 로 설정  
+지오해시 셀의 크기는 precision 옵션을 통해 설정  
+
+모양 색인하기  
+```
+curl -XPUT localhost:9200/인덱스명/인덱스번호 -d '{
+  "area": {
+    "type": "polygon",
+	"coordinates": [
+	  [
+	    [45, 30],
+	    [46, 30],
+	    [45, 31],
+	    [46, 32]
+	  ]
+	]
+  }
+}'
+```
+
+겹치는 모양 걸러내기  
+```
+curl localhost:9200/인덱스명/_search -d '{
+  "query": {
+    "filtered": {
+	  "filter": {
+	    "geo_shape": {
+		  "area": {
+		    "shape": {
+			  "type": "polygon",
+			  "coordinates": [
+			   [
+			     [45, 30.5],
+			     [46, 30.5],
+			     [45, 31.5],
+			     [46, 32.5]
+			   ]
+			  ]
+			}
+		  }
+		}
+	  }
+	}
+  }
+}'
+```
+
+사이트 플러그인  
+헤드 플러그인 head plugin, 일래스틱서치 코프 kopf, 빅데스크 bigdesk, 일래스틱서치 hq, 왓슨 whatson  
+
+
+코드 플러그인  
+일래스틱서치가 실행하는 JVM 코드를 포함하는 플러그인, AWS 플러그인, ICU분석 플러그인  
+aws, zure, elasticsearch-lang-python, elasticsearch-lang-ruby 등(elasticsearch-lang-*)  
+
+마블 플러그인(https://www.elastic.co/kr/downloads/marvel)  
+
+플러그인 설치  
+config 폴더가 있는 위치에서 "bin/plugin -install mobz/elasticsearch-head" 명령어 실행  
+[https://mobz.github.io/elasticsearch-head/](https://mobz.github.io/elasticsearch-head/)  
+
+설치된 플러그인 확인  
+$ bin/plugin --list  
+
+사이트 플러그인 접속  
+http://localhost:9200/_plugin/이름  
+
+elasticsearch에 사용 플러그인 명세  
+elasticsearch.yml > "plugin.mandatory: analysis-icu,head" 추가  
+플러그인 설치 후 바로 시작  
+
+플러그인 제거  
+$ bin/plugin --remove 이름  
+
+하이라이팅(type:plain)  
+- no_match_size: 프래그먼트가 갖길 원하는 문자 수
+- require_field_match:true 쿼리와 일치하는 필드만 하이라이트
+- fragment_size: 0으로 설정하면 전체 필드 내용이 보인다, 필드별로 보일 문자 수 조절 가능
+- number_of_fragments: 프래그먼트 수 조절, 0으로 설정하면 전체 필드를 하나의 프래그먼트로 변환, fragment_size 무시
+
+하이라이트 리스코어링  
+```
+curl localhost:9200/인덱스명/_search -d '{
+  "query": {
+    "match": {
+	  "name": "elasticsearch search"
+	}
+  },
+  "rescore": {
+    "window_size": 200,
+	"query": {
+	  "rescore_query": {
+	    "wildcard": {
+		  "tags.verbatim": "*search"
+		}
+	  }
+	}
+  },
+  "highlight": {
+    "highlight_query": {
+	  "query_string": {
+	    "query": "name:elasticsearch name:search tags.verbatim:*search"
+	  }
+	},
+	"fields": {
+	  "name": {},
+	  "tags.verbatim": {}
+	}
+  }
+}'
+```
+
+포스팅 하이라이터(type:postings)  
+하이라이트할 필드에 index_options를 offsets로 설정하여 색인에 각 필드 위치(포지션과 오프셋)를 저장해야 한다  
+모든 일치하는 텀 하이라이팅  
+```
+curl localhost:9200/_analyze -d '검색어1 검색어2...'
+# 각 텀의 오프셋 추출 가능
+```
+
+패스트 백터 하이라이터(type:fvh)  
+매핑에서 "term_vector:with_positions_offsets" 로 설정  
+플레인 하이라이터 처럼 구에 속한 텀들만 하이라이트  
+다중 필드 하이라이트 할때 다중 필드를 하나로 합쳐 모든 일치하는 것들을 하이라이트한다  
+```
+# 다중 필드 하이라이트
+"highlight": {
+  "fields": {
+    "description": { "matched_fields": ["description", "descrption.suffix"]}
+  }
+}
+
+# 다른 프래그먼트에 다른 태그 사용
+# 첫 하이라이트는 b태그 그 다음 태그는 em 태그로 적용된다
+"highlight": {
+  "fields": {
+    "description": {
+	  "pre_tags": ["<b>", "<em>"],
+	  "post_tags": ["</b>", "</em>"]
+	}
+  }
+}
+
+# 하이라이트 순번 매기기
+"highlight": {
+  "tags_schema": "styled",
+  "fields": {
+    "description": {}
+  }
+}
+클래스 이름(hlt숫자)를 이용하여 표시
+```
+
+하이라이트 경계 문자 설정  
+```
+# _very_very_very_very_<em>long</em>_name=1 과 같이 프래그먼트 구분
+"highlight": {
+  "fields": {
+    "description": {
+	  "fragment_size": 20,
+	  "boundary_chars": ".,!?\t\n_"
+	}
+  }
+}
+```
+
+패스트 벡터 하이라이터 일치 수 제한하기  
+phrase_limit 파라미터 사용  
+
+
+모니터링 플러그인  
+- 빅데스크 Bigdesk: 클러스터 시각화
+- Elastic HQ: 관리와 모니터링을 함께
+- 헤드 Head: 고급 쿼리 생성
+- 코프 Kopf: 스냅샷, 워머, 퍼컬레이터
+- Elasticsearch Marvel: 상세한 분석
+- 세마텍스트 SPM: 클라우드와 설치형으로 성능 모니터링, 쿼리, 알람, 이상감지 기능 제공
+
+
