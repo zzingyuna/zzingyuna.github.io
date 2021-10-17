@@ -22,7 +22,7 @@ setInterval(): 특정한 시간마다 함수를 실행
 - encodeURIComponent(urlComponent): 대부분의 문자를 모두 인코딩
 - decodeURIComponent(encodedURI): 대부분의 문자를 모두 디코딩
 
-#### _
+#### javascript
 - eval(): 문자열을 자바스크립트 코드로 실행하는 함수
 - isFinite(): number가 무한한 값인지 확인
 - isNaN(): number가 NaN인지 확인
@@ -211,6 +211,8 @@ IE 이벤트 연결 및 제거
 attachEvent(eventProperty, eventListener); 이벤트가 추가되는 형식  
 detachEvent(eventProperty, eventListener); 함수명을 모르면 제거 불가  
 
+#### JQuery
+
 JQuery 속성 선택자  
 - 요소[속성=값] 속성과 값이 같은 객체 선택
 - 요소[속성|=값] 속성 안의 값이 특정 값과 같은 객체 선택
@@ -229,4 +231,88 @@ JQuery 속성 선택자
 - 요소:lt(n) n번째 미만에 위치하는 객체 선택
 - 요소:not(선택자) 선택자와 일치하지 않는 객체 선택
 - 요소:nth-child(3n+1) 3n+1번째에 위치하는 객체 선택 (예: 1,4,7..)
+
+$.noConflict()  
+플러그 간 충돌 방지 메서드, jquery $를 사용할 수 없음  
+
+end() 문서 객체 선택을 한 단계 뒤로 돌린다  
+
+
+on() 이벤트 연결 / off() 이벤트 제거 / one() 이벤트 한 번만 연결  
+
+trigger() 이벤트 강제 발생  
+
+preventDefault() 기본 이벤트 제거  
+stopPropagation() 이벤트 전달 제거  
+
+
+innerfade 사진 변환 효과 innerfade 플러그인 사용  
+
+clearQueue()  
+메소드가 호출되어 실행되지 않은 대기열에 모든 함수는 큐로부터 제거  
+
+stop()  
+현재 실행 중인 애니메이션을 중지  
+
+delay()  
+큐에 있는 명령을 잠시 중지  
+
+
+
+#### node js  
+
+내부 모듈  
+- os
+-- hostname(): 운영체제의 호스트 이름 리턴
+-- type(): 운영체제의 이름 리턴
+-- platform(): 운영체제의 플랫폼 리턴
+-- arch(): 운영체제의 아키텍처 리턴
+-- release(): 운영체제의 버전 리턴
+-- uptime(): 운영제체가 실행된 시간 리턴
+-- loadavg(): 로드 에버리지 정보를 담은 배열 리턴
+-- totalmem(): 시스템의 총 메모리 리턴
+-- freemem(): 시스템의 사용 가능한 메모리 리턴
+-- cpus(): CPU 정보를 담은 객체 리턴
+-- getNetworkInterfaces(): 네트워크 인터페이스의 정보를 담은 배열 리턴
+
+
+외부 모듈  
+> npm install 모듈명  
+
+웹 서버 만들기  
+```
+# 설치
+> npm install express  
+
+# 파일 작성 (server.js)
+var http = require('http');
+var express = require('express');
+
+var app = express();
+app.use(app.router); # 라우터
+app.get('/a', function (request, response){
+    response.send('<h1>Page A</h1>')
+});
+app.all('/b', function (request, response){
+    response.send('<h1>page B</h1>')
+});
+
+app.use(function(request, response, next) { #app.use = 미들웨어
+  request.test = "request test";
+  response.text = "response test";
+  next();
+});
+
+app.use(function(request, response, next) {
+  response.send('<h1>'+request.test+'/'+response.test+'</h1>');
+});
+app.use(express.static('폴더명')); #해당 폴더에 이미지나 js 파일 등을 읽어와서 사용가능
+
+http.createServer(app).listen(포트번호, function() {
+  console.log('Server Running at http://127.0.0.1:포트번호');
+});
+
+# 실행
+> node server.js
+```
 
