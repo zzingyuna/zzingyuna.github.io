@@ -515,3 +515,59 @@ Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides가 출판한
 * XSLT : XML 문서를 조작할 수 있도록 개발된 기술
 
 
+[https://code.google.com/archive/p/string-template-view-engine-mvc/](https://code.google.com/archive/p/string-template-view-engine-mvc/)  
+[https://code.google.com/archive/p/nhaml/](https://code.google.com/archive/p/nhaml/)  
+
+NHibernate  
+NHProfiler  
+
+IoC 컨테이너  
+- Castle Windsor
+- StructureMap
+- Ninject
+- Unity
+- Spring.NET
+
+NHProf 도구  
+: 실행된 sql쿼리 뿐만 아니라 사용중인 세션 수 등 NHibernate 프레임워크에 대한 통계 정보까지 제공  
+
+WCF  
+
+블로그 포스트 무료 서비스  
+https://www.blogger.com/  
+
+SSL (Secure Sockets Layer)을 이용한 트래픽 암호화
+: RequireHttpsAttribute 액션 필터 사용  
+
+크로스 사이트 스크립팅 공격 방어 (XSS방어)
+: 사용자에게 보일 모든 정보 인코딩  
+
+크로스 사이트 요청 위조(CSRF: Cross-Site Request Forgery)
+: HTML 헬퍼의 AntiForgeryToken() 메서드를 호출, 폼에 숨겨진 필드 추가, 사용자가 폼을 전송할때 이 토큰을 확인  
+
+서드파티 인증
+:System.Web.Security.MembershipProvider 클래스 상속하여 구현  
+
+비밀번호 저장 방법
+: 단방향 해시 이용, SHA256 알고리즘 사용, 암호화된 비밀번호에 소금 뿌리기(Salt Phrases)  
+
+ELMAH (Error Logging Modules and Handlers)
+: 에러가 발생한 시점에 메모리에 남아있던 폼 데이터와 세션 데이터를 추가로 보여줌  
+
+빌드 자동화 도구  
+NAnt, MSBuild, Psake(PowerShell이용)  
+
+Migrator.NET
+: 데이터베이스를 업그레이드 할 수 있는 c# 마이그레이션 파일을 생성하는 도구  
+
+db.Deploy.NET
+: SQL 스크립트를 데이터베이스에 차례로 실행하여 현재 버전 생성  
+
+PSTools
+: 테크넷(TechNet)을 통해 제공하는 무료 도구인 psexec.exe 파일을 포함, 원격 명령을 실행할 수 있는 명령 줄 도구  
+
+CM.NET
+: MSBuild와 NAnt를 이용한 빌드 및 배포 스크립트 예제 제공  
+
+CruiseControl.NET : 오픈 소스 CI 서버  
+
