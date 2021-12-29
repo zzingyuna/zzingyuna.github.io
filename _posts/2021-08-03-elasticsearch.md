@@ -2893,12 +2893,24 @@ function_score 질의
 - percentile_ranks
 - cardinality: 유일한 사용자 수를 찾을 때
 
+메트릭 집계(Metrics Aggregations)  
+특정 필드에 대해 합이나 평균을 계산하거나 다른 집계와 중첩하여 결과에 대해 특정 필드의 _score값에 따라 정렬 등의 계산, 다양한 집계 수행  
+
 다중 버킷 집계  
 - 텀즈 집계 Terms aggergations
 - 범위 집계
 - 히스토그램 Histogram
 - 중첩 역 중첩
 - 지오 거리, 지오 해시 그리드
+
+파이프라인 집계(Pipeline Aggregations)  
+다른 집계로 생성된 버킷을 참조해서 집계 수행  
+
+형제 집계(Sibling Aggregations)  
+동일 선상의 위치에서 수행되는 새 집계  
+
+부모 집계(Parent Aggregations)  
+집계를 통해 생성된 버킷을 사용해계산을 수행하고 그 결과를 기존 집계에 반영  
 
 top_hits 집계  
 하위 집계의 결과를 묶어서 보여줌  
@@ -3166,6 +3178,13 @@ threadpool.bulk.queue_size: 200
 - 노드별 현재 상태 조회: curl localhost:9200/_nodes/stats/indices/fielddata?fields=*&pretty=1
 - 색인별 현재 상태 조회: curl localhost:9200/_stats/fielddata?fields=*&pretty=1
 - 노드별 색인별 현재 상태 조회: curl localhost:9200/_nodes/stats/indices/fielddata?level=indices&fields=*&pretty=1
+
+질의의 결과 캐시  
+indices.requests.cache.size: 1%(기본값)  
+
+노드의 모든 샤드가 공유하는 캐시  
+index.queries.chche.enabled: true  
+
 
 서킷 브레이커  
 메모리 부족 에러 방지를 위해 인위적인 임계치  
@@ -3702,3 +3721,43 @@ PUT /my_index/_settings
 POST /hug_sharepoint/_open
 
 ```
+
+
+
+전처리 필터
+- Html Strip Char 필터
+
+
+토크나이저 필터  
+- Standard
+- WHITESPACE TOKENIZER
+- Ngram
+- Edge Ngram
+- Keyword
+
+
+토큰 필터
+- Ascii Folding
+- Lowercase
+- Uppercase
+- Stop
+- Stemmer
+- Synonym
+- Trim
+
+
+글로벌 타임아웃 설정  
+모든 검색 쿼리에 동일하게 적용되도록 정책으로 설정, 기본값 -1(무제한)  
+```
+PUT _cluster/settings
+{
+    "transient": {
+        "search.default_search_timeout": "1s"
+    }
+}
+```
+
+
+질의 결과에대한 스코어 계산확인 -> _explain 사용  
+질의를 실행하는 과정에서 각 샤드별로 얼마나 많은 시간이 소요되는지 확인 -> "profile": true 사용  
+
