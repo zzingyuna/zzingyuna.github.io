@@ -1442,9 +1442,14 @@ date_range 집계
 ip_range 집계  
 missing 집계  
 nested 집계  
+children 집계
+top_hits 집계
+matrix_stats 집계
 histogram 집계  
 date_histogram 집계  
 geo_distance 집계  
+geo_bounds 집계
+geo_centroid 집계
 geohash_grid 집계: [https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-aggregations-bucket-geohashgrid-aggregation.html)  
 필터 쿼리: 필터 결과는 점수에 의해 정렬되지 않는다. 모든 결과에 대한 점수가 1.0 이므로..  
 
@@ -3760,4 +3765,61 @@ PUT _cluster/settings
 
 질의 결과에대한 스코어 계산확인 -> _explain 사용  
 질의를 실행하는 과정에서 각 샤드별로 얼마나 많은 시간이 소요되는지 확인 -> "profile": true 사용  
+
+
+
+샤드 크기가 10GB 이상은 되지 않아야 한다
+노드의 최적 수치: 노드의 개수/2 + 1
+node.master = false, node.data = false 의 경우 검색 로드 밸런스(노드에서 데이터를 읽어오고 결과를 집계하는 등등)처럼 역할
+
+Merge
+시간이 지나면서 작은 세그먼트를 모아 새로운 단편(fragment)에 쓰고 삭제한다, 단편화가 많으면 색인 성능은 떨어진다.
+index.merge.scheduler.max_thread_count 로 머지 스케줄링 설정 가능
+
+색인 축소
+색인의 샤드 개수 축소
+index.blocks.write: true
+인덱스명/_shrink/reduceindex
+index.blocks.write: false
+
+데이터 새로고침 주기
+index.refresh_interval
+
+_rollover
+검사할 조건을 정의하고 elasticsearch에 남겨두면 새 색인을 롤링, alias를 이용해서 가상 색인만 참조하게 할 수 있다
+
+sudo bin/elasticsearch-plugin install ingest-attachment
+첨부 파일 수집 플러그인을 사용하면 Elasticsearch가 Apache 텍스트 추출 라이브러리 Tika 를 사용하여 일반적인 형식(예: PPT, XLS 및 PDF)의 첨부 파일을 추출할 수 있습니다 .
+
+suggestion 추천 기능
+제안 기능은 제안자를 사용하여 제공된 텍스트를 기반으로 유사하게 보이는 용어를 제안합니다.
+
+검색 GET Preference
+검색을 실행할 샤드 복사본을 선택
+https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-preference.html#search-request-preference
+
+ctx.op 값 설정
+ctx.op = "delete" 스크립트 실행 후 도큐먼트 삭제
+ctx.op = "none" 도큐먼트는 색인 과정을 건너뛴다, 스크립트가 도큐먼트를 변경하지 않았다면 색인 재생성 오버헤드를 막기 위해 해당 값으로 설정하는 것이 좋다.
+ctx._timestamp 레코드의 타임스탬프
+
+_update
+원본 도큐먼트가 없으면 doc_as_upsert로 upsert 제공
+필드 삭제: "script": {"inline": "ctx._source.remove(\"필드명\")"}
+필드 추가: "script": {"inline": "ctx._source.필드명=필드내용"}
+
+_mget
+다중 get 호출
+
+search_after
+스크롤 결과를 빠르게 건너뛸 수 있는 기능
+
+_delete_by_query
+쿼리로 삭제
+
+_update_by_query
+
+span 쿼리
+
+
 
