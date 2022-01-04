@@ -3764,62 +3764,92 @@ PUT _cluster/settings
 
 
 질의 결과에대한 스코어 계산확인 -> _explain 사용  
-질의를 실행하는 과정에서 각 샤드별로 얼마나 많은 시간이 소요되는지 확인 -> "profile": true 사용  
+질의를 실행하는 과정에서 각 샤드별로 얼마나 많은 시간이 소요되는지 확인 -> "profile": true 사용   
 
 
 
-샤드 크기가 10GB 이상은 되지 않아야 한다
-노드의 최적 수치: 노드의 개수/2 + 1
-node.master = false, node.data = false 의 경우 검색 로드 밸런스(노드에서 데이터를 읽어오고 결과를 집계하는 등등)처럼 역할
+샤드 크기가 10GB 이상은 되지 않아야 한다  
+노드의 최적 수치: 노드의 개수/2 + 1  
+node.master = false, node.data = false 의 경우 검색 로드 밸런스(노드에서 데이터를 읽어오고 결과를 집계하는 등등)처럼 역할  
 
-Merge
-시간이 지나면서 작은 세그먼트를 모아 새로운 단편(fragment)에 쓰고 삭제한다, 단편화가 많으면 색인 성능은 떨어진다.
-index.merge.scheduler.max_thread_count 로 머지 스케줄링 설정 가능
+Merge   
+시간이 지나면서 작은 세그먼트를 모아 새로운 단편(fragment)에 쓰고 삭제한다, 단편화가 많으면 색인 성능은 떨어진다.  
+index.merge.scheduler.max_thread_count 로 머지 스케줄링 설정 가능  
 
-색인 축소
-색인의 샤드 개수 축소
-index.blocks.write: true
-인덱스명/_shrink/reduceindex
-index.blocks.write: false
+색인 축소   
+색인의 샤드 개수 축소  
+index.blocks.write: true   
+인덱스명/_shrink/reduceindex   
+index.blocks.write: false   
 
-데이터 새로고침 주기
-index.refresh_interval
+데이터 새로고침 주기  
+index.refresh_interval  
+ 
+_rollover  
+검사할 조건을 정의하고 elasticsearch에 남겨두면 새 색인을 롤링, alias를 이용해서 가상 색인만 참조하게 할 수 있다  
 
-_rollover
-검사할 조건을 정의하고 elasticsearch에 남겨두면 새 색인을 롤링, alias를 이용해서 가상 색인만 참조하게 할 수 있다
+sudo bin/elasticsearch-plugin install ingest-attachment  
+첨부 파일 수집 플러그인을 사용하면 Elasticsearch가 Apache 텍스트 추출 라이브러리 Tika 를 사용하여 일반적인 형식(예: PPT, XLS 및 PDF)의 첨부 파일을 추출할 수 있습니다 .  
 
-sudo bin/elasticsearch-plugin install ingest-attachment
-첨부 파일 수집 플러그인을 사용하면 Elasticsearch가 Apache 텍스트 추출 라이브러리 Tika 를 사용하여 일반적인 형식(예: PPT, XLS 및 PDF)의 첨부 파일을 추출할 수 있습니다 .
+suggestion 추천 기능  
+제안 기능은 제안자를 사용하여 제공된 텍스트를 기반으로 유사하게 보이는 용어를 제안합니다.  
+ 
+검색 GET Preference   
+검색을 실행할 샤드 복사본을 선택  
+https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-preference.html#search-request-preference  
 
-suggestion 추천 기능
-제안 기능은 제안자를 사용하여 제공된 텍스트를 기반으로 유사하게 보이는 용어를 제안합니다.
+ctx.op 값 설정  
+ctx.op = "delete" 스크립트 실행 후 도큐먼트 삭제  
+ctx.op = "none" 도큐먼트는 색인 과정을 건너뛴다, 스크립트가 도큐먼트를 변경하지 않았다면 색인 재생성 오버헤드를 막기 위해 해당 값으로 설정하는 것이 좋다.  
+ctx._timestamp 레코드의 타임스탬프  
 
-검색 GET Preference
-검색을 실행할 샤드 복사본을 선택
-https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-preference.html#search-request-preference
+_update  
+원본 도큐먼트가 없으면 doc_as_upsert로 upsert 제공  
+필드 삭제: "script": {"inline": "ctx._source.remove(\"필드명\")"}  
+필드 추가: "script": {"inline": "ctx._source.필드명=필드내용"}  
 
-ctx.op 값 설정
-ctx.op = "delete" 스크립트 실행 후 도큐먼트 삭제
-ctx.op = "none" 도큐먼트는 색인 과정을 건너뛴다, 스크립트가 도큐먼트를 변경하지 않았다면 색인 재생성 오버헤드를 막기 위해 해당 값으로 설정하는 것이 좋다.
-ctx._timestamp 레코드의 타임스탬프
+_mget  
+다중 get 호출  
 
-_update
-원본 도큐먼트가 없으면 doc_as_upsert로 upsert 제공
-필드 삭제: "script": {"inline": "ctx._source.remove(\"필드명\")"}
-필드 추가: "script": {"inline": "ctx._source.필드명=필드내용"}
+search_after  
+스크롤 결과를 빠르게 건너뛸 수 있는 기능  
 
-_mget
-다중 get 호출
+_delete_by_query  
+쿼리로 삭제  
 
-search_after
-스크롤 결과를 빠르게 건너뛸 수 있는 기능
+_update_by_query  
 
-_delete_by_query
-쿼리로 삭제
+span 쿼리  
 
-_update_by_query
-
-span 쿼리
+노드 오버헤드: 일부 노드는 너무 많은 샤드가 할당돼 전체 클러스터의 병목이 될 수 있다  
+노드 셧다운: 가득 찬 디스크, 하드웨어 장애 및 전원 문제와 같은 여러 가지 이유로 발생할 수 있다  
+샤드 재배치 문제나 변형: 일부 샤드는 온라인 상태를 얻을 수 없다  
+너무 큰 샤드: 샤드가 너무 큰 경우 대량의 루씬 세그먼트 병합으로 인해 색인 성능이 저하된다  
+빈 색인과 빈 샤드: 메모리와 자원을 낭비하지만 모든 샤드에는 많은 활성 스레드가 있기 때문에 사용되지 않는 색인과 샤드가 많은 경우 일반 클러스터 성능이 저하된다.  
 
 
+작업 목록  
+https://www.elastic.co/guide/en/elasticsearch/reference/current/tasks.html  
+
+핫 스레드  
+https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-hot-threads.html  
+
+샤드 할당의 현재 상태  
+_cluster/allocation/explain  
+
+캐시 정리  
+인덱스명/_cache/clear  
+
+cerebro  
+클러스터와 데이터에 대한 개요 제공  
+https://github.com/lmenezes/cerebro  
+
+인제스트 파이프라인  
+https://m.blog.naver.com/olpaemi/222005459201  
+
+[Logstash] grok 필터, 정규표현식  
+https://ksr930.tistory.com/105  
+
+Ingest geoip Processor Plugin  
+https://www.elastic.co/guide/en/elasticsearch/plugins/6.8/ingest-geoip.html  
 
