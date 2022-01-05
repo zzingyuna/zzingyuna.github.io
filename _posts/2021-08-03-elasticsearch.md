@@ -3856,3 +3856,6 @@ https://www.elastic.co/guide/en/elasticsearch/plugins/6.8/ingest-geoip.html
 elastic4  
 스칼라 클라이언트, 빅데이터 등에 사용   
 https://github.com/sksamuel/elastic4s  
+
+아파치 스파크  
+https://ko.wikipedia.org/wiki/%EC%95%84%ED%8C%8C%EC%B9%98_%EC%8A%A4%ED%8C%8C%ED%81%AC  
