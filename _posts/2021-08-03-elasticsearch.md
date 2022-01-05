@@ -3853,3 +3853,6 @@ https://ksr930.tistory.com/105
 Ingest geoip Processor Plugin  
 https://www.elastic.co/guide/en/elasticsearch/plugins/6.8/ingest-geoip.html  
 
+elastic4  
+스칼라 클라이언트, 빅데이터 등에 사용   
+https://github.com/sksamuel/elastic4s  
