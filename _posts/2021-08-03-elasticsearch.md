@@ -3881,3 +3881,20 @@ OnError, OnOutOfMemoryError 옵션이 설정되어 있으면 안된다
 G1GC를 사용할 경우 JVM이 JDK 8u40 이후 버전인지 체크
 14. All Permission 체크
 
+
+노드의 종류  
+Single Node 모드  
+검색 클러스터 규모가 작을 때 모든 노드가 동일하게 동작하는 것이 유리, 3대 이하의 소규모 클러스터 구축시 모든 노드를 Single Node 모드로 동작하는 것이 유리  
+
+Master Node 모드  
+인덱스 생성, 변경, 삭제 담당. 노드의 상태를 주기적으로 점검해서 장애에 대비  
+
+Data Node 모드  
+데이터를 보관하고 데이터의 CURD, 검색, 집계 등 담당. 대용양 저장소(Storage) 필요, 고성능의 CPU, 메모리 갖춘 서버 사용하는 것이 좋음  
+
+Ingest Node 모드  
+다양한 형태의 데이터 색인 시 데이터 전처리 담당, Single Node의 경우에도 기본 옵션으로 Ingest 기능 사용 가능  
+
+Coordination Node 모드  
+사용자의 요청을 받아 처리하는 코디네이터 모드, 노드 관련 속성을 모두 false로 설정  
+
