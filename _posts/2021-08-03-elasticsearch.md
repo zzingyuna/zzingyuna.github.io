@@ -3859,3 +3859,25 @@ https://github.com/sksamuel/elastic4s
 
 아파치 스파크  
 https://ko.wikipedia.org/wiki/%EC%95%84%ED%8C%8C%EC%B9%98_%EC%8A%A4%ED%8C%8C%ED%81%AC  
+
+부트스트랩 체크 과정  
+1. 힙 크기 체크 Heap size check  
+jvm 옵션 -Xms, -Xmx 설정 Memory Lock과 관련 있음
+2. 파일 디스크립터 체크 File descriptor check
+3. 메모리 락 체크 Memory lock check
+4. 최대 스레드 수 체크 Maximum number of threads check
+5. 최대 가상 메모리 크기 체크 Maximum size virtual memory check  
+가상 메모리 크기를 무제한(unlimit)으로 설정
+6. 최대 파일 크기 체크 Max file size check
+7. mmap 카운트 체크 Maximum map count check
+8. 클라이언트 JVM 체크 Client JVM check
+9. Serial Collector 사용 여부 체크  
+Serial CG를 사용하지 않도록 검사
+10. 시스템 콜 필터 체크 System call filter check
+11. OnError, OnOutOfMemoryError 체크  
+OnError, OnOutOfMemoryError 옵션이 설정되어 있으면 안된다
+12. Early-access 체크
+13. G1GC 체크  
+G1GC를 사용할 경우 JVM이 JDK 8u40 이후 버전인지 체크
+14. All Permission 체크
+
