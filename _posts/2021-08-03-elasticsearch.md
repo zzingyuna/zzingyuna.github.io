@@ -3898,3 +3898,17 @@ Ingest Node 모드
 Coordination Node 모드  
 사용자의 요청을 받아 처리하는 코디네이터 모드, 노드 관련 속성을 모두 false로 설정  
 
+연산에 대한 통제가 불가능한 상황이라면 시스템 전체의 장애를 방지하기 위해 Coordination 노드 별도 구축
+대량의 데이터를 처리해야 하는 집계 연산이 많은 경우에는 반드시 전용 Coordination 노드로만 요청 받기
+
+클러스터 Split Brain 문제 방지  
+마스터 노드 후보 투표 직전에 네트워크 단절 등으로 클러스터 안에 마스터 후보 노드들이 자신이 마스터 노드가 되어야 한다는 잘못된 판단으로
+하나 이상의 노드가 마스터 노드로 전환되면서 데이터 노드도 마스터 노드 개수만큼 분리되고 샤드 조각이 존재하지 않는 등 데이터들이 마구 복구되고 클러스터 전체가 뒤죽박죽 될 수 있다  
+discovery.zen.minimum_master_nodes 속성으로 대기 중인 마스터 노드 후보들이 투표로 마스터를 선정  
+
+벤치마크 툴  
+Luceneutil  
+https://github.com/mikemccand/luceneutil  
+
+Rally  
+https://www.elastic.co/kr/blog/announcing-rally-benchmarking-for-elasticsearch  
