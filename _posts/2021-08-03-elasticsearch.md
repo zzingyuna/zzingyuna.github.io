@@ -4,67 +4,51 @@ layout: post
 
 # Elasticsearch
 
-디렉터리 구조
-bin: elasticsearch 인스턴스를 구동하고 플러그인 관리에 필요한 스크립트를 담은 디렉터리
-config: 구성 파일이 위치한 디렉터리
-lib: elasticsearch가 사용하는 라이브러리를 포함한 디렉터리
-
-elasticsearch 시작 후 생성된 디렉터리 구조
-data: elasticsearch가 사용할 모든 자료가 저장될 위치
-logs: 이벤트와 오류에 대한 정보가 담긴 파일이 저장될 위치
-plugins: 설치된 플러그인이 저장된 위치
-work: elasticsearch가 사용하는 임시 파일이 저장될 위치
-
 
 JVM(Java Virtual Machine) 힙 메모리 제약
 ES_HEAP_SIZE 값을 1024보다 크게 설정, 전체 시스템 메모리의 50%가 넘지 않아야 한다.
 
 
-클러스터 상태 점검
-$ curl -XGET http://127.0.0.1:9200/_cluster/health?pretty
 
-elasticsearch 중단
+elasticsearch 중단  
 $ curl -XPOST http://127.0.0.1:9200/_cluster/nodes/_shutdown
 
-단일 노드만 중단
+단일 노드만 중단  
 $ curl -XPOST http://127.0.0.1:9200/_cluster/nodes/노드식별번호/_shutdown
 
-노드 식별자 확인
-$ curl -XPOST http://127.0.0.1:9200/_cluster/State/nodes/
-
-신규 다큐먼트 생성
+신규 다큐먼트 생성  
 $ curl -XPUT http://127.0.0.1:9200/blog/article/1 -d {"title": "제목", "content": "내용"}
 
-자동 식별자 생성, 다큐먼트 생성
+자동 식별자 생성, 다큐먼트 생성  
 $ curl -XPUT http://127.0.0.1:9200/blog/article/ -d {"title": "제목", "content": "내용"}
 
-다큐먼트 인출
+다큐먼트 인출  
 $ curl -XGET http://127.0.0.1:9200/blog/article/1
 
-다큐먼트 갱신
+다큐먼트 갱신  
 $ curl -XPUT http://127.0.0.1:9200/blog/article/1/_update -d '{"script": "ctx._source.content = \"내용 수정\""}'
 
-다큐먼트 갱신, 없는 필드값 추가
+다큐먼트 갱신, 없는 필드값 추가  
 $ curl -XPOST http://127.0.0.1:9200/blog/article/1/_update -d '{\"creator\": \"User1\"}'
 
-다큐먼트 삭제
+다큐먼트 삭제  
 $ curl -XDELETE http://127.0.0.1:9200/blog/article/1
 
-검색 질의 기본
+검색 질의 기본  
 $ curl -XGET http://127.0.0.1:9200/blog/_search?
 
-두가지 색인에 대한 검색 질의
+두가지 색인에 대한 검색 질의  
 $ curl -XGET http://127.0.0.1:9200/blog,sns/_search?
 
-검색의 타입 지정에 대한 검색 질의
+검색의 타입 지정에 대한 검색 질의  
 $ curl -XGET http://127.0.0.1:9200/blog/es/_search?
 
-질의 텍스트가 분석되는 방법 확인 질의
+질의 텍스트가 분석되는 방법 확인 질의  
 $ curl -XGET 'http://127.0.0.1:9200/blog/_analyze?field=title' -d '검색단어'
 
-여러개 매개변수로 질의
-$ curl -XGET 'http://127.0.0.1:9200/blog/_search?q=pubished:2013&df=title&explain=true&default_operator=AND'
-(리눅스 시스템에서는 shell이 &문자를 분석하기 때문에 '싱클 쿼테이션 필요)
+여러개 매개변수로 질의  
+$ curl -XGET 'http://127.0.0.1:9200/blog/_search?q=pubished:2013&df=title&explain=true&default_operator=AND'  
+(리눅스 시스템에서는 shell이 &문자를 분석하기 때문에 '싱클 쿼테이션 필요)  
 
 q 매개변수에 필드 지시자가 없을 경우 df 매개변수로 기본 검색 필드를 지정가능  
 analyzer 프로퍼티는 질의 분석에 사용될 분석기 이름 정의  
