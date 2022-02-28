@@ -23,7 +23,7 @@ $ curl -XPOST http://127.0.0.1:9200/_cluster/nodes/노드식별번호/_shutdown
 6. 클러스터의 allocation 활성화
 7. 클러스터가 그린 상태가 되기를 기다림
 
-샤드 재분배 중지 설정
+샤드 재분배 중지 설정  
 ```
 curl -XPUT 'localhost:9200/_cluster/settings' -d '{
     "transient": {
@@ -32,7 +32,7 @@ curl -XPUT 'localhost:9200/_cluster/settings' -d '{
 }'
 ```
 
-샤드 재분배 활성화 설정
+샤드 재분배 활성화 설정  
 ```
 curl -XPUT 'localhost:9200/_cluster/settings' -d '{
     "transient": {
@@ -42,7 +42,7 @@ curl -XPUT 'localhost:9200/_cluster/settings' -d '{
 ```
 
 
-* 샤드와 레플리카 수동으로 옮기기  
+샤드와 레플리카 수동으로 옮기기  
 ```
 # 1.샤드 옮기기
 curl -XPOST 'localhost:9200/_cluster/reroute' -d '{
