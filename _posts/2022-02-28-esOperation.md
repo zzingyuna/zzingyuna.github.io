@@ -303,3 +303,113 @@ c 글자로 시작하는 색인만 복구
 - rename_pattern: 스냅샷에 저장된 색인 이름 변경, 정규표현식 값 사용  
 - rename_replacement: rename_pattern과 함께 목표 색인 이름 정의  
 
+
+
+
+##### 하이라이팅 max 
+```
+PUT /hug_*/_settings
+{
+  "index": {
+    "highlight.max_analyzed_offset": 1000000
+  }
+}
+```
+
+##### 샤드 파편화 조각모음
+```
+POST /hug_confluence/_forcemerge?max_num_segments=1
+```
+
+##### health 체크 timeout 옵션
+```
+curl --connect-timeout 1 -XGET "http://elastic:elasticpwd@localhost:9200/_cluster/health?pretty"
+```
+
+
+
+
+```
+Use bulk requestsedit
+Use multiple workers/threads to send data to Elasticsearch
+Increase the refresh interval
+Disable refresh and replicas for initial loads
+Disable swapping
+Give memory to the filesystem cache
+Use auto-generated ids
+Use faster hardware
+Indexing buffer size
+Disable_field_names
+Additional optimizations
+대량 요청 사용편집
+여러 작업자/스레드를 사용하여 Elasticsearch에 데이터 보내기
+새로 고침 간격 늘리기
+초기 로드에 대해 새로 고침 및 복제본 비활성화
+스와핑 비활성화
+파일 시스템 캐시에 메모리 제공
+자동 생성 ID 사용
+더 빠른 하드웨어 사용
+인덱싱 버퍼 크기
+비활성화_필드_이름
+추가 최적화
+
+
+coordinate 노드 별도 구축하는 방법 확인
+(연산에 대한 통제가 불가능한 상황이라면 시스템 전체의 장애를 방지하기 위해 coordinate 노드 별도 구축)
+-> 로드 밸런스 역할, 클러스터 크기가 더 클 때 필요.
+-> 서울반도체의 경우 현재 3개의 노드 사용중, coordinate 노드 추가를 위해 추가 서버 제공 필수
+   data 노드는 coordinate 노드 역할을 수행하는데 coordinate노드로 지정(고정)을 하는 경우
+   master 노드 1개, coordinate 노드 1개, data 노드가 1개로 1개의 data 노드에 과부화 가능성 높음
+-> 설정값
+node.master: false
+node.data: false
+node.ingest: false
+node.ml: false
+cluster.remote.connect: false
+```
+
+
+
+```
+GET _cat/health?v
+GET _cat/nodes?v
+
+GET _cat/indices?v&s=index
+GET _cat/shards?v&s=index&s=node
+
+
+GET /_cat/thread_pool/write,flush,refresh?v=true&h=id,name,active,queue,rejected,completed&pretty&s=id
+
+
+GET _cat/tasks?v&h=action,task_id,timestamp,running_time&s=id
+GET _cat/tasks?v&detailed&h=action,task_id,running_time,description
+
+
+POST /*/_forcemerge?max_num_segments=1
+POST /*/_cache/clear
+
+
+
+GET */_settings
+PUT */_settings
+{
+  "index.translog.flush_threshold_size": "1024MB",
+  "index.translog.flush_threshold_size" : null,
+  "index.blocks.read_only": false,
+  "index.blocks.write": null,
+  "index.refresh_interval": "1s",
+  "number_of_replicas": 0
+}
+
+
+PUT */_settings
+{
+	"index.search.slowlog.threshold.query.warn": "10s",
+	"index.search.slowlog.threshold.query.info": "5s",
+	"index.search.slowlog.threshold.query.debug": "2s",
+	"index.search.slowlog.threshold.fetch.warn": "1s",
+	"index.search.slowlog.threshold.fetch.info": "800ms",
+	"index.search.slowlog.threshold.fetch.debug": "500ms"
+}
+```
+
