@@ -3,21 +3,28 @@ layout: post
 title: 틀린그림 찾기
 ---
 
-# 틀린그림찾기 게임
+# 자바스크립트로 만든 - 틀린 그림 찾기 게임
 
-자바스크립트로 만든 게임 - 틀린그림찾기 게임
 
-```
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="description" content="Free Web tutorials">
-  <meta name="keywords" content="HTML,CSS,XML,JavaScript">
-  <meta name="author" content="John Doe">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Page Title</title>
-  <style>
+<button id="btnStart" onclick="Start()">Start</button>
+<br />
+<br />
+<p>남은 시간 : <span id="time"></span></p>
+<p>남은 목숨 : <span id="live"></span></p>
+<p style='color:gainsboro;'>해, 귀, 잔디, 새, 꼬리</p>
+<img src="http://itcm.co.kr/files/attach/images/813/303/896/9560e06ad62db403df4053f066ee9b6e.jpg"/>
+<div class="ans1"></div>
+<div class="ans1_1"></div>
+<div class="ans2"></div>
+<div class="ans2_1"></div>
+<div class="ans3"></div>
+<div class="ans3_1"></div>
+<div class="ans4"></div>
+<div class="ans4_1"></div>
+<div class="ans5"></div>
+<div class="ans5_1"></div>
+
+<style>
 body {  background-color: gainsboro;}
 h1 {  color: darkcyan;  text-align: center;}
 p {  font-family: verdana;  font-size: 20px;}
@@ -33,43 +40,14 @@ img {cursor: pointer;}
 .ans4_1{position: absolute;top: 483px;left: 636px;}
 .ans5{position: absolute;top: 630px;left: 80px;}
 .ans5_1{position: absolute;top: 584px;left: 473px;}
-  </style>
-  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-</head>
-<body>
+</style>
 
-<h1>틀린그림찾기</h1>
-<p>사진두개 비교</p>
-<br />
-
-<button id="btnStart" onclick="Start()">Start</button>
-
-<br />
-<br />
-<p>남은 시간 : <span id="time"></span></p>
-<p>남은 목숨 : <span id="live"></span></p>
-<p style='color:gainsboro;'>해, 귀, 잔디, 새, 꼬리</p>
-<img src="http://itcm.co.kr/files/attach/images/813/303/896/9560e06ad62db403df4053f066ee9b6e.jpg"/>
-
-<div class="ans1"></div>
-<div class="ans1_1"></div>
-
-<div class="ans2"></div>
-<div class="ans2_1"></div>
-
-<div class="ans3"></div>
-<div class="ans3_1"></div>
-
-<div class="ans4"></div>
-<div class="ans4_1"></div>
-
-<div class="ans5"></div>
-<div class="ans5_1"></div>
-
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 <script>
 	var time = 30; //남은시간
 	var live = 2;  //남은목숨
 	var finish; //남은시간 체크하는 setInterval
+	var isStarted = false;
 
 	// 게임시작
 	function Start(){
@@ -80,6 +58,7 @@ img {cursor: pointer;}
 		finish = setInterval(StartTimeCheck, 1000);
 		$("#btnStart").hide();
 		$("div.ok").removeClass("ok");
+		isStarted = true;
 	}
 
 	// 시간줄이기
@@ -99,6 +78,10 @@ img {cursor: pointer;}
 	}
 
 	$("img").bind("click", function(event) {
+		if (!isStarted) {
+			return;
+		}
+
 		if(live < 1){
 			alert("Game OVER!\n목숨이 없습니다. 새로 게임을 시작해주세요."); 
 			clearInterval(finish);
@@ -106,8 +89,8 @@ img {cursor: pointer;}
 			return false;
 		}
 		
-        var x = event.pageX - this.offsetLeft;
-        var y = event.pageY - this.offsetTop;
+		var x = event.pageX - this.offsetLeft;
+		var y = event.pageY - this.offsetTop;
 		
 		//해
 		// 98,110  120,110  98,132  120,132
@@ -189,6 +172,3 @@ img {cursor: pointer;}
 		}
     });
 </script>
-</body>
-</html>
-```
