@@ -90,7 +90,7 @@ height:100px;
         $("button.on").addClass("off");
         $("button.on").removeClass("on");
         $("#btn"+num).removeClass("off");   
-        $("#btn"+num).addClass("on");        
+        $("#btn"+num).addClass("on");
     }
 
     function Start(){

@@ -6,43 +6,6 @@ title: 스크립트 계산기
 # 스크립트 계산기
 
 
-
-<style type="text/css">
-
-table tr td { text-align: center; border-width: 0px; }
-input { width: 40px; height: 40px;  font-size: x-large; background-color: infobackground; font-family:AR DESTINE; }
-#aaa { width: 200px; height: 30px; }
-
-</style>
-<script type="text/javascript">
-var txt1="";
-	function gjr(val){
-		var abc=document.forms[0].aaa.value;
-		txt1=abc+val.value;
-		//var abc2=eval(txt1);
-		document.forms[0].aaa.value=txt1;
-		txt1=document.forms[0].aaa.value;
-	}
-	function gjf2(){
-		txt1=document.forms[0].aaa.value;
-		var qqq=txt1.substring(0, txt1.length-1);
-		document.forms[0].aaa.value=qqq;
-		alert("??");
-	}
-	function gjf3(){
-		txt1=document.forms[0].aaa.value;
-		var abc=eval(txt1);
-		document.forms[0].aaa.value=txt1+"="+abc;
-		txt1="";
-	}
-	function cencle(){
-		document.forms[0].aaa.value="";
-		txt1="";
-	}
-	
-</script>
-
-
 <form onkeydown="enter1()">
   <table border="1" width="250" height="300" align="center" background="image/angular_study2.JPG" bordercolor="pink">
     <tr>
@@ -76,3 +39,30 @@ var txt1="";
 		</tr>
 	</table>
 </form>
+
+<script type="text/javascript">
+	var txt1="";
+	function gjr(val){
+		var abc=document.forms[0].aaa.value;
+		txt1=abc+val.value;
+		//var abc2=eval(txt1);
+		document.forms[0].aaa.value=txt1;
+		txt1=document.forms[0].aaa.value;
+	}
+	function gjf2(){
+		txt1=document.forms[0].aaa.value;
+		var qqq=txt1.substring(0, txt1.length-1);
+		document.forms[0].aaa.value=qqq;
+		alert("??");
+	}
+	function gjf3(){
+		txt1=document.forms[0].aaa.value;
+		var abc=eval(txt1);
+		document.forms[0].aaa.value=txt1+"="+abc;
+		txt1="";
+	}
+	function cencle(){
+		document.forms[0].aaa.value="";
+		txt1="";
+	}
+</script>
