@@ -1,5 +1,6 @@
 ---
 layout: post
+title: 구구단 게임
 ---
 
 # 구구단 게임

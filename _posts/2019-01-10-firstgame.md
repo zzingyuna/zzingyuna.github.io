@@ -1,5 +1,6 @@
 ---
 layout: post
+title: 두더지 게임
 ---
 
 # 두더지 게임
