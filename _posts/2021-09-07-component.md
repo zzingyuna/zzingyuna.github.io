@@ -1,6 +1,6 @@
 ---
 layout: post
-title: '컴포넌트'
+title: nonono
 ---
 
 # 컴포넌트
