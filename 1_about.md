@@ -12,22 +12,13 @@ permalink: /about.html
   
   
   
-  
->Angular  
+>java  
 >
-[https://github.com/zzingyuna/StudyAngular.git](https://github.com/zzingyuna/StudyAngular.git)  
+[https://github.com/zzingyuna/StudyJava.git](https://github.com/zzingyuna/StudyJava.git)  
   
 >Node.js  
 >
 [https://github.com/zzingyuna/StudyNodeJs.git](https://github.com/zzingyuna/StudyNodeJs.git)  
-  
->WPF  
->
-[https://github.com/zzingyuna/StudyWPF.git](https://github.com/zzingyuna/StudyWPF.git)  
-  
->java  
->
-[https://github.com/zzingyuna/StudyJava.git](https://github.com/zzingyuna/StudyJava.git)  
   
 >React  
 >
@@ -37,8 +28,3 @@ permalink: /about.html
 >
 [https://github.com/zzingyuna/python.git](https://github.com/zzingyuna/python.git)  
   
->php  
->
-[https://github.com/zzingyuna/php.git](https://github.com/zzingyuna/php.git)  
-
-
