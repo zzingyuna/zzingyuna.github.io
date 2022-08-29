@@ -3,35 +3,10 @@ layout: post
 title: 가위바위보 게임
 ---
 
-# 가위바위보 게임
+# 자바스크립트로 만든 게임 - 가위바위보 게임
 
-자바스크립트로 만든 게임 - 가위바위보 게임
 
-```
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="description" content="Free Web tutorials">
-  <meta name="keywords" content="HTML,CSS,XML,JavaScript">
-  <meta name="author" content="John Doe">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Page Title</title>
-  <style>
-body {
-  background-color: aliceblue;
-}
-
-h1 {
-  color: darkcyan;
-  text-align: center;
-}
-
-p {
-  font-family: verdana;
-  font-size: 20px;
-}
-
+<style>
 .butt1
 {
  background: url(https://t1.daumcdn.net/cfile/tistory/13045F404D7C365D23) no-repeat 0px 0px #FF8800;
@@ -55,28 +30,19 @@ p {
 {
  transform: rotate(180deg);
 }
-  </style>
-  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-</head>
-<body>
+</style>
 
-<h1>가위 바위 보!!</h1>
-<p>컴퓨터랑 가위바위보 게임하기</p>
-<br />
-
-<p>남은 시간 : <span id="time"></span></p>
-<p>점수 : <span id="score"></span></p>
-
+남은 시간 : <span id="time"></span>
+점수 : <span id="score"></span>
 <button onclick="Start()">Start</button>
 <br />
 <br />
-
 <div id="computer"></div>
-
 <button class="butt1" onclick="EventClick(this);"></button>
 <button class="butt2" onclick="EventClick(this);"></button>
 <button class="butt3" onclick="EventClick(this);"></button>
 
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 <script>
 	var score = 0; //점수
 	var time = 30; //남은시간
@@ -154,9 +120,4 @@ p {
 		 if(now.getTime() > stop)return;
 	   }
 	}
-
 </script>
-</body>
-</html>
-
-```

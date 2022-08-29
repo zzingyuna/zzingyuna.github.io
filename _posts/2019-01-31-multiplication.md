@@ -7,42 +7,19 @@ title: 구구단 게임
 
 자바스크립트로 만든 게임 - 구구단 게임
 
-```
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="description" content="Free Web tutorials">
-  <meta name="keywords" content="HTML,CSS,XML,JavaScript">
-  <meta name="author" content="John Doe">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Page Title</title>
-  <style>
-body {  background-color: gainsboro;}
-h1 {  color: darkcyan;  text-align: center;}
-p {  font-family: verdana;  font-size: 20px;}
-  </style>
-  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-</head>
-<body>
 
-<h1>구구단 게임!!</h1>
-<p>컴퓨터가 내는 구구단 맞추기</p>
-<br />
 
 <button id="btnStart" onclick="Start()">Start</button>
-
 <br />
 <br />
 <p>남은 시간 : <span id="time"></span></p>
 <p>점수 : <span id="score"></span></p>
-
-
 <br />
 <p id="computer">구구단질문</p>
 <input type="text" id="txtUserInput" name="" value=""/>
 <button class="butt1" onclick="EventClick();">정답제출</button>
 
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 <script>
 	var score = 0; //점수
 	var time = 30; //남은시간
@@ -113,7 +90,3 @@ p {  font-family: verdana;  font-size: 20px;}
 		}
 	});
 </script>
-</body>
-</html>
-
-```
