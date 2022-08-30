@@ -6,6 +6,236 @@ layout: post
 
 
 
+search_type
+내부적으로 질의를 처리하는 방식 선택
+색인의 크기가 커져도 괜찮다면 퍼지/와일드카드/구문 쿼리 대신 엔그램과 싱글을 사용하면 검색이 빨라짐
+스크립트 사용 보다 색인 시 새로운 필드를 추가하여 검색 속도 향상
+스크립트가 자주 변경되지 않으면 elasticsearch 플러그인 형태로 네이티브 스크립트 작성
+샤드별로 문서 빈도가 불균형하면 dfs_query_then_fetch 사용
+많은 문서를 탐색해야 한다면 스캔 검색 사용
+search_type 요청 매개변수를 추가하고 아래 값 중 하나를 선택
+- query_then_fetch: 기본값, 다큐먼트를 정렬하고 순위를 매기고자 할때, 전체 샤드의 검색이 모두 수행된 후 결과 출력, 전체 취합된 결과를 size 매개변수에서 지정한 수만큼 출력
+- query_and_fetch: 모든 샤드를 대상으로 병렬로 질의 수행, 샤드별로 검색되는대로 결과 출력, size * 샤드 갯수만큼 출력
+- dfs_query_then_fetch: query_then_fetch와 같으나 정확한 스코어링을 위해 검색어들을 사전 처리, 분산된 키워드 빈도를 계산하는 작업 추가 단계 존재
+- dfs_query_and_fetch: query_and_fetch와 같으나 정확한 스코어링을 위해 검색어들을 사전 처리, 분산된 키워드 빈도를 계산하는 작업 추가 단계 존재
+- count: 질의와 일치하는 다큐먼트 수만 반환
+- scan: 질의가 엄청난 결과를 반환하리라 기대할 경우에 사용
+
+
+
+검색 수행 우선순위
+질의를 수행할 샤드 제어, preference 요청 매개변수에 설정
+_primary 주 샤드에서만 실행, 색인에서 최신 정보를 사용하길 원하지만 자료가 바로 복제되지 않을 경우 유용
+_primary_first 주 샤드에서 실행
+_local 요청을 전송받은 노드의 사용 가능한 샤드에서 실행
+_only_node:node_id 노드 식별자로 지정한 노드에서 실행
+_preter_node:node_id 노드 식별자로 지정한 노드에서 실행, 해당 노드가 사용 불가할 경우 다른 노드에서 실행
+_shards:1,2 샤드 식별자로 지정한 샤드에서 검색 연산 수행
+
+
+
+
+
+엘라스틱서치가 제공하는 가능성
+Script: 실제 스크립트 코드 포함
+Lang: 언어에 대한 정보, 생략시 MVEL 가정
+Params: 매개변수와 값 포함
+
+스크립트 수행 과정에서 사용 가능한 객체
+_doc: 계산된 점수와 필드값을 사용해 찾은 현재 다큐먼트에 접근하게 만든다, 예) _doc.title.value
+_source: 현재 다큐먼트의 원본과 여기에 정의된 값에 접근하게 만든다, 예) _source.title
+_fields: 다큐먼트 필드값에 접근할 목적으로 사용한다, 예) _fields.title.value
+
+필드 하나는 다음과 같이 색인에 저장
+
+_source 다큐먼트의 일부
+해석되지 않은 상태에서 저장된 값
+토큰으로 해석되어 색인된 값
+
+
+
+아파치 티카 Apache Tika
+랭귀지 디텍션 Language detaction
+분석기가 lang 필드에 기반해 선택되기를 원하면 엘라스틱서치에 존재하는 분석기 이름 중 하나를 lang필드 값에 추가해야한다
+
+
+
+스크롤 API
+스크롤 관련 정보와 결과에 대한 정보를 엘라스틱서치라 얼마나 오랫동안 보존해야 할지 제안하는 값
+
+질의 전송 예
+curl -XGET 'localhost:9200/library/_search?pretty&scroll=5m' -d '{ "query": { "match_all": {} } }'
+
+엘라스틱서치는 종단점 _search/scroll 제공
+scroll_id 를 사용해 다음 이어지는 페이지를 얻을 수 있다
+해당 핸들은 일정 시간동안만 유효하므로 지정 시간이 지나면 무효화된 값이되어 오류 응답을 반환한다
+
+
+
+스케일 아웃
+
+클러스터에 노드 추가
+노드 업그레이드
+스케일링 전략
+
+오버 샤딩: 미리 감안하여 색인에 대해 의도적으로 다수의 샤드 생성
+데이터를 색인과 샤드에 분할하기
+처리량 극대화 하기(예: 색인이 진행되는 동안 레플리카 수를 줄이고 색인 작업이 종료되면 레플리카 수를 늘린다)
+
+
+
+할당 인식 Allocation Awareness
+데이터의 복제본이 어디에 위치할지에 대한 인지 상태, 클러스터의 위상 topology 설계.
+
+샤드 기반 할당: "cluster.routing.allocation.awareness.attributes:rack"로 설정, "node.rack:1" 메타데이터 키가 할당 인식 파라미터
+강제 할당 인식: "cluster.routing.allocation.awareness.attributes:zone", "cluster.routing.allocation.force.zone.values:us-east,us-west"로 설정
+
+
+
+스레드 풀 종류
+
+bulk: 기본값은 가용 프로세서 수
+index: 기본값은 가용 프로세서 수
+search: 기본값은 가용 프로세서 수 * 3
+
+
+
+I/O가 사용할 노드 수준 제한
+indices.store.throttle.type: none(노드전체)/merge(머지할때제한)/all(모든 노드 모든 샤드에 대한 작업 제한 한계점 적용)
+index.store.throttle.type: node(노드전체)/merge(머지할때제한)/all(모든 노드 모든 샤드에 대한 색인 작업 제한 한계점 적용)
+노드 수준 설정의 경우 "indices.store.throttle.max_bytes_per_sec: 50mb" 사용(초당 메가바이트),
+색인 수준 설정의 경우 index.store.throttle.max_bytes_per_sec 사용
+
+저장소 플러그인: 아마존 S3, 하둡 HDFS
+
+
+
+Merge
+시간이 지나면서 작은 세그먼트를 모아 새로운 단편(fragment)에 쓰고 삭제한다, 단편화가 많으면 색인 성능은 떨어진다.
+index.merge.scheduler.max_thread_count 로 머지 스케줄링 설정 가능
+
+색인 축소
+색인의 샤드 개수 축소
+index.blocks.write: true
+인덱스명/_shrink/reduceindex
+index.blocks.write: false
+
+
+
+_rollover
+검사할 조건을 정의하고 elasticsearch에 남겨두면 새 색인을 롤링, alias를 이용해서 가상 색인만 참조하게 할 수 있다
+
+suggestion 추천 기능
+제안 기능은 제안자를 사용하여 제공된 텍스트를 기반으로 유사하게 보이는 용어를 제안합니다.
+
+검색 GET Preference
+검색을 실행할 샤드 복사본을 선택
+https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-preference.html#search-request-preference
+
+ctx.op 값 설정
+ctx.op = "delete" 스크립트 실행 후 도큐먼트 삭제
+ctx.op = "none" 도큐먼트는 색인 과정을 건너뛴다, 스크립트가 도큐먼트를 변경하지 않았다면 색인 재생성 오버헤드를 막기 위해 해당 값으로 설정하는 것이 좋다.
+ctx._timestamp 레코드의 타임스탬프
+
+_update
+원본 도큐먼트가 없으면 doc_as_upsert로 upsert 제공
+필드 삭제: "script": {"inline": "ctx._source.remove("필드명")"}
+필드 추가: "script": {"inline": "ctx._source.필드명=필드내용"}
+
+_mget
+다중 get 호출
+
+search_after
+스크롤 결과를 빠르게 건너뛸 수 있는 기능
+
+_delete_by_query
+쿼리로 삭제
+
+_update_by_query
+
+span 쿼리
+
+노드 오버헤드: 일부 노드는 너무 많은 샤드가 할당돼 전체 클러스터의 병목이 될 수 있다
+노드 셧다운: 가득 찬 디스크, 하드웨어 장애 및 전원 문제와 같은 여러 가지 이유로 발생할 수 있다
+샤드 재배치 문제나 변형: 일부 샤드는 온라인 상태를 얻을 수 없다
+너무 큰 샤드: 샤드가 너무 큰 경우 대량의 루씬 세그먼트 병합으로 인해 색인 성능이 저하된다
+빈 색인과 빈 샤드: 메모리와 자원을 낭비하지만 모든 샤드에는 많은 활성 스레드가 있기 때문에 사용되지 않는 색인과 샤드가 많은 경우 일반 클러스터 성능이 저하된다.
+
+
+
+압축 해제 rpm, deb 설치
+config/ /etc/elasticsearch/
+logs/ /var/log/elasticsearch/
+
+
+
+배열 필드
+단일 필드를 다중 필드 설정으로 데이터 재색인 없이 업그레이드 할 수 있다
+다중 필드를 단일로 변경할 수 없다
+한 번 지정하면 매핑에서 서브 필드를 삭제할 수 없다
+
+동시성 제어 방법
+
+낙관적 잠금(Optimistic locking) : 병렬 작업 허용, 드물게 나타나는 충돌 추정
+비관적 잠금(Pessimistic locking) : 충돌을 야기하는 작업을 막으면서 방지
+
+
+retry_on_conflict 파라미터
+어플리케이션 도움 없이 자동으로 일래스틱서치가 재시도
+
+범위 검색을 사용할때 바이너리 매치("이 도큐먼트는 범위 내에 있다 또는 이 도큐먼트는 범위 내에 없다")를 가지는 범위 쿼리로 들어간 도큐먼트는
+범위 쿼리가 되는데 필요하지 않기 때문에 쿼리로 만들지 필터로 만들지 확실치 않다면 필터로 만들자.
+
+
+필드 데이터 캐시
+elasticsearch가 색인 문서들에서 필드의 값을 저장하는 인 메모리 캐시이고 정렬, 스크립팅 혹은 필드들 안의 값들을 집계할 때 사용
+데이터를 압축하는 방식으로 적재
+필드 정렬이나 집합에 수행시 fielddata 매핑에 loading을 eager로 설정
+
+필드 데이터 관리
+
+메모리 제한: indices.fielddata.cache.size, indices.fielddata.cache.expire 설정
+서킷 브레이커 circuit breaker에 필드 데이터 사용
+doc values로 메모리값 무시: 색인 데이터와 함께 디스크에 저장하고 그 값을 사용, 매핑 속성에 "doc_values:true" 설정
+TF-IDF(TF=term frequency / 단어빈도, IDF=inverse document frequency /역 문서 빈도)
+하나의 문서에서 단어가 자주 반복된다면 관련성은 높아진다, 전체 문서에서 단어가 자주 반복된다면 관련성은 낮아진다
+
+기본 점수 계산 함수
+조합 인자 coordination factor: 얼마나 많은 문서에서 찾았는지, 얼마나 많은 단어를 찾았는지
+질의 표준화 query normalization: 질의 결과 비교
+
+
+부스팅(boosting)
+문서의 관련성을 수정하는 절차. 문서를 색인할때 부스팅, 문서를 질의할때 부스팅이 있다
+부스팅하는 값은 절대값이 아닌 상대값이다.
+
+
+
+
+중요도 정의
+입력 자료 필드의 중요도 정의
+{
+    "title": "The Complete Sherlock Holmes",
+    "author": {
+        "_value": "Arthur Conan Doyle",
+        "_boost": 10.0
+    },
+    "year": 1936
+}
+매핑에서 중요도 정의
+{
+    "mappings": {
+        "book": {
+            "properties": {
+                "title": { "type": "string" },
+                "author": { "type": "string", "boost": 10.0 }
+            }
+        }
+    }
+}
+
+
+
 elasticsearch 중단  
 $ curl -XPOST http://127.0.0.1:9200/_cluster/nodes/_shutdown
 
@@ -305,16 +535,6 @@ c 글자로 시작하는 색인만 복구
 
 
 
-
-##### 하이라이팅 max 
-```
-PUT /hug_*/_settings
-{
-  "index": {
-    "highlight.max_analyzed_offset": 1000000
-  }
-}
-```
 
 ##### 샤드 파편화 조각모음
 ```

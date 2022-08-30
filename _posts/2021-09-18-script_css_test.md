@@ -1,8 +1,9 @@
 ---
 layout: post
+title: script + css 테스트
 ---
 
-# test
+# script + css 테스트
 
 <script type="text/javascript">
 	$(function(){
