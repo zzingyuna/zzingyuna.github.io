@@ -129,7 +129,7 @@ font-size: x-large;
 <div class="spin_img">
 	<div class="sel"></div>
 	<div id="m">
-		<img src="https://zzingyuna.github.io/image/po1.JPG" alt="0">
+		<img src="https://zzingyuna.github.io/image/gameexam.JPG" alt="0">
 		<img src="https://zzingyuna.github.io/image/po2.JPG" alt="1">
 		<img src="https://zzingyuna.github.io/image/po3.JPG" alt="2">
 		<img src="https://zzingyuna.github.io/image/po4.JPG" alt="3">
