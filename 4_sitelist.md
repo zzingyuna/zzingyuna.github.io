@@ -1,7 +1,6 @@
 ---
 layout: page
 title: 참고사이트
-tagline: Sitelist
 ---
 
 
