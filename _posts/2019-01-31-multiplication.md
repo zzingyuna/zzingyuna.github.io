@@ -60,13 +60,9 @@ title: 구구단 게임
 		if (!isContinue) {alert("시간이 종료되었습니다."); return;}
 		var userVal = $("#txtUserInput").val();
 		if((num1 * num2) == userVal){
-			alert("맞췄습니다.");
 			score = score+1;
 			$("#score").text(score);
 			GetQuestion();
-		}
-		else{
-			alert("틀렸습니다.");
 		}
 	}
 
