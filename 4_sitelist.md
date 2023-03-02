@@ -4,7 +4,6 @@ title: 참고사이트
 ---
 
 
-하나씩 차근차근
 
 [페이스북 테스트](http://www.fbrell.com/Sharing/2%20-%20FB.ui%20Dialogs)  
 
@@ -16,17 +15,11 @@ title: 참고사이트
 
 [유니코드값 확인](http://aci.selfip.org/support/unicode/escchrt13.php)  
 
-[카카오톡 api](https://developers.kakao.com/apps)  
-
-[개발문제](https://www.acmicpc.net/problemset)  
-
 [KB, MB, GB단위환산](http://mwultong.blogspot.com/2008/01/kb-mb-gb-tb-pb-convert.html)  
 
 [웹개발 강좌](http://www.deadfire.net/index.html)  
 
-[json..?](http://json2csharp.com/)  
-
-[파이썬을 파이썬답게](https://programmers.co.kr/learn/courses/4008/lessons/13254)  
+[Convert JSON to POJO Objects](http://json2csharp.com/)  
 
 [정규식 뽑기](https://regexr.com/)  
 
@@ -38,19 +31,23 @@ title: 참고사이트
 
 [닷넷커뮤니티](http://www.devpia.com/)  
 
-[타입스크립트](https://ahnheejong.gitbook.io/ts-for-jsdev/01-introducing-typescript/why-typescript) 
-
 [developer.mozilla.org](https://developer.mozilla.org/ko/)  
 
+[개발문제](https://www.acmicpc.net/problemset)  
+
 [패스트캠퍼스](https://fastcampus.co.kr/)  
+
+[프로그래머스](https://programmers.co.kr/)  
+
+[오픈튜토리얼스](https://opentutorials.org/)  
+
+[Coursera](https://www.coursera.org/)  
+
+[파이썬을 파이썬답게](https://programmers.co.kr/learn/courses/4008/lessons/13254)  
 
 [파이썬 기초](https://kongdols-room.tistory.com/18)  
 
 [타입스크립트](https://heropy.blog/2020/01/27/typescript/)  
-
-[엘라스틱서치](https://esbook.kimjmin.net/)  
-
-[엘라스틱서치 REST API](https://www.jopenbusiness.com/mediawiki/ElasticSearch_-_REST_API)  
 
 [자격증 기출문제](https://www.comcbt.com/)  
 
@@ -60,13 +57,11 @@ title: 참고사이트
 
 [게임엔진](https://defold.com/)  
 
-[프로그래머스](https://programmers.co.kr/)  
-
-[오픈튜토리얼스](https://opentutorials.org/)  
-
-[Coursera](https://www.coursera.org/)  
-
 [김종민 - 처음부터 시작하는 ElasticSearch]([https://www.coursera.org/)  
+
+[엘라스틱서치](https://esbook.kimjmin.net/)  
+
+[엘라스틱서치 REST API](https://www.jopenbusiness.com/mediawiki/ElasticSearch_-_REST_API)  
 
 [정규식 테스트 사이트](https://regexr.com/)  
 
@@ -76,14 +71,15 @@ title: 참고사이트
 
 [http://koxo.com](http://koxo.com)  
 
+[http://jqueryfordesigners.com](http://jqueryfordesigners.com)
+JQuery for Designers는 시각 효과나 사용자 인터페이스를 만드는 방법 동영상 강의로 제공  
 
-- JQuery for Designers [http://jqueryfordesigners.com](http://jqueryfordesigners.com)는 시각 효과나 사용자 인터페이스를 만드는 방법 동영상 강의로 제공
 - 스티븐 칩맨이 작성한 W3 DOM에 대한 소개 [http://slayeroffice.com/articles/DOM](http://slayeroffice.com/articles/DOM)문서 객체 모델의 기본개념과 사용법을 다룬 온라인 프리젠테이션
 - DOM Cheat Sheet(http://www.wait-till-i.com/2007/06/27/dom-javascript-cheat-sheet)웹페이지의 HTML에 접근하고 관리할 때 사용하는 표준 DOM방식 목록을 간략하게 정리한 PDF문서
-- W3C 웹 사이트의 문서 객체 모델 섹션(http://www.w3.org/DOM) DOM에 대해 상세하지만 난해하고 기술적으로 설명. HTML, CSS등의 웹 기술에 익숙한 사람들에게는 명확한 정보를 제공
-- W3Schools.com의 HTML DOM 자습서(http://www.w3schools.com/htmldom)에서는 문서객체 모델에 대해 쉽고 빠르게 배움
-- 크리스 헤일먼의 Show Love to the Object Literal(http://www.wait-till-i.com/2006/02/16/show-love-to-the-object-literal) 자바스크립트 객체 리터럴을 잘 사용하는법 소개하는 글
-- 팀 휴든의 Object Oriented JavaScript(http://nefariousdesigns.co.uk/archive/2006/05/object-oriented-javascript) 복잡한 주제에 대한 간략히 소개, 자바스크립트로 객체지향 프로그래밍을 처음 배우려고 할때 좋음
+- W3C 웹 사이트의 문서 객체 모델 섹션 [http://www.w3.org/DOM](http://www.w3.org/DOM) DOM에 대해 상세하지만 난해하고 기술적으로 설명. HTML, CSS등의 웹 기술에 익숙한 사람들에게는 명확한 정보를 제공
+- W3Schools.com의 HTML DOM 자습서 [http://www.w3schools.com/htmldom](http://www.w3schools.com/htmldom)에서는 문서객체 모델에 대해 쉽고 빠르게 배움
+- 크리스 헤일먼의 Show Love to the Object Literal [http://www.wait-till-i.com/2006/02/16/show-love-to-the-object-literal](http://www.wait-till-i.com/2006/02/16/show-love-to-the-object-literal) 자바스크립트 객체 리터럴을 잘 사용하는법 소개하는 글
+- 팀 휴든의 Object Oriented JavaScript [http://nefariousdesigns.co.uk/archive/2006/05/object-oriented-javascript](http://nefariousdesigns.co.uk/archive/2006/05/object-oriented-javascript) 복잡한 주제에 대한 간략히 소개, 자바스크립트로 객체지향 프로그래밍을 처음 배우려고 할때 좋음
 - Sorting a JavaScript array using arrat.sort()(http://www.javascriptkit.com/javatutors/arraysort.shtml) 배열을 정렬하는 법에 대한 유용한 정보 제공. 배열 무작위 섞기 빠른 방법 등..
 - Eloquent JavaScript(http://eloquentjavascript.net) 자바스크립트 실습 사이트
 - 크리스천 하일맨의 Unobtrusive JavaScript(http://www.onlinetools.org/articles/unobtrusivejavascript/index.html) 겸손한 자바스크립트라는 개념을 설명하기 위한 미니사이트 누구나 접근할 수 있는 웹사이트 만드는법 제공
