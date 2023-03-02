@@ -66,88 +66,19 @@ title: 참고사이트
 
 [Coursera](https://www.coursera.org/)  
 
-#### 안드로이드 테스트 관련   
-[https://m.blog.naver.com/PostView.nhn?blogId=90600074&logNo=120199537891&proxyReferer=https%3A%2F%2Fwww.google.com%2F](https://m.blog.naver.com/PostView.nhn?blogId=90600074&logNo=120199537891&proxyReferer=https%3A%2F%2Fwww.google.com%2F)  
-  
-[https://blog.naver.com/testexplorer/220785170361](https://blog.naver.com/testexplorer/220785170361)  
-  
-[https://academy.realm.io/kr/posts/aw212-android-unit-ui-test-recorder-data-binding-include/](https://academy.realm.io/kr/posts/aw212-android-unit-ui-test-recorder-data-binding-include/)  
+[김종민 - 처음부터 시작하는 ElasticSearch]([https://www.coursera.org/)  
 
+[정규식 테스트 사이트](https://regexr.com/)  
 
-#### Android 앱 개발
+[파이썬 shell 웹버전 사이트](http://pythontutor.com/live.html#mode=edit)  
 
-[https://m.blog.naver.com/zic325/220869942869](https://m.blog.naver.com/zic325/220869942869)  
-
-[https://m.blog.naver.com/PostView.nhn?blogId=pyj721aa&logNo=221275562630&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F](https://m.blog.naver.com/PostView.nhn?blogId=pyj721aa&logNo=221275562630&proxyReferer=https%3A%2F%2Fwww.google.co.kr%2F)  
-
-[http://bitsoul.tistory.com/58](http://bitsoul.tistory.com/58)  
-
-[http://superwony.tistory.com/14](http://superwony.tistory.com/14)  
-
-
-#### 김종민 - 처음부터 시작하는 ElasticSearch
-[https://ela.st/es-resource-kr](https://ela.st/es-resource-kr)  
-
-
-
-#### nodeJS  
-[https://velopert.com/node-js-tutorials](https://velopert.com/node-js-tutorials)  
-[https://appear.github.io/tags/Node/](https://appear.github.io/tags/Node/)  
-  
-[http://poiemaweb.com/](http://poiemaweb.com/)  
-  
-  
-#### javascript_quiz  
-[http://javascript-puzzlers.herokuapp.com/](http://javascript-puzzlers.herokuapp.com/)  
-[http://davidshariff.com/js-quiz/#q=1](http://davidshariff.com/js-quiz/#q=1)  
-[http://blog.javarouka.me/2012/01/blog-post_2408.html?m=1](http://blog.javarouka.me/2012/01/blog-post_2408.html?m=1)  
-  
-  
-#### angularJS  
-[http://visualize.tistory.com/442](http://visualize.tistory.com/442)  
-  
-  
-#### 챗봇  
-[https://www.gupshup.io/developer/docs/bot-platform/guide/a-hello-world-bot](https://www.gupshup.io/developer/docs/bot-platform/guide/a-hello-world-bot)  
-[https://medium.com/chatbotkorea/세계-챗봇-생태계-분석-1698f6205bed](https://medium.com/chatbotkorea/세계-챗봇-생태계-분석-1698f6205bed)  
-[https://www.gupshup.io/developer/mybots?name=ynBotTest#nlp](https://www.gupshup.io/developer/mybots?name=ynBotTest#nlp)  
-  
-  
-#### 정규식 테스트 사이트  
-[https://regexr.com/](https://regexr.com/)  
-  
-  
-#### 인프런 강좌 강의 사이트  
-[https://www.inflearn.com/](https://www.inflearn.com/)
-  
-  
-#### 파이썬 shell 웹버전 사이트(파이썬 설치 없이 웹으로 간단한 테스트 가능)  
-[http://pythontutor.com/live.html#mode=edit](http://pythontutor.com/live.html#mode=edit)  
-  
-  
-#### 퍼블 블로그  
-[https://mikkeller.github.io/](https://mikkeller.github.io/)  
-  
-
-###### c++
-[http://www.soen.kr/](http://www.soen.kr/)  
-
-
-#### RequestProcessor 클래스
-[http://blog.daum.net/oraclejava/15861768](http://blog.daum.net/oraclejava/15861768)  
-
-
-[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide)  
+[c / c++](http://www.soen.kr/)  
 
 [http://koxo.com](http://koxo.com)  
 
-[https://www.w3schools.com/js/](https://www.w3schools.com/js/)  
 
-[www.quirksmode.org](www.quirksmode.org)  
-
-
-- JQuery for Designers(http://jqueryfordesigners.com)는 시각 효과나 사용자 인터페이스를 만드는 방법 동영상 강의로 제공
-- 스티븐 칩맨이 작성한 W3 DOM에 대한 소개(http://slayeroffice.com/articles/DOM)문서 객체 모델의 기본개념과 사용법을 다룬 온라인 프리젠테이션
+- JQuery for Designers [http://jqueryfordesigners.com](http://jqueryfordesigners.com)는 시각 효과나 사용자 인터페이스를 만드는 방법 동영상 강의로 제공
+- 스티븐 칩맨이 작성한 W3 DOM에 대한 소개 [http://slayeroffice.com/articles/DOM](http://slayeroffice.com/articles/DOM)문서 객체 모델의 기본개념과 사용법을 다룬 온라인 프리젠테이션
 - DOM Cheat Sheet(http://www.wait-till-i.com/2007/06/27/dom-javascript-cheat-sheet)웹페이지의 HTML에 접근하고 관리할 때 사용하는 표준 DOM방식 목록을 간략하게 정리한 PDF문서
 - W3C 웹 사이트의 문서 객체 모델 섹션(http://www.w3.org/DOM) DOM에 대해 상세하지만 난해하고 기술적으로 설명. HTML, CSS등의 웹 기술에 익숙한 사람들에게는 명확한 정보를 제공
 - W3Schools.com의 HTML DOM 자습서(http://www.w3schools.com/htmldom)에서는 문서객체 모델에 대해 쉽고 빠르게 배움
