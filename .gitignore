@@ -1,0 +1,26 @@
+# Bundler cache
+.bundle
+vendor
+#Gemfile.lock #해당 파일에 설정된 os정보를 사용해야 에러가 나지 않는다
+
+# Jekyll cache
+.jekyll-cache
+.jekyll-metadata
+_site
+
+# RubyGems
+*.gem
+
+# NPM dependencies
+node_modules
+package-lock.json
+
+# IDE configurations
+.idea
+.vscode
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Misc
+#_sass/dist #해당 파일을 추가해주어야 필요한 bootstrap 파일을 가져온다
+#assets/js/dist #해당 파일을 추가해주어야 필요한 js파일들을 가져온다
